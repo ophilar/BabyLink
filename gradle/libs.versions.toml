@@ -192,6 +192,12 @@ grpc-protobuf-lite = { module = "io.grpc:grpc-protobuf-lite", version.ref = "grp
 grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "grpc" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 
+play-services-nearby = { module = "com.google.android.gms:play-services-nearby", version = "18.3.0" }
+gson = { module = "com.google.code.gson:gson", version = "2.10.1" }
+tensorflow-lite = { module = "org.tensorflow:tensorflow-lite", version = "2.13.0" }
+tensorflow-lite-task-audio = { module = "org.tensorflow:tensorflow-lite-task-audio", version = "0.4.4" }
+webrtc-android = { module = "io.webrtc:google-webrtc", version = "1.0.32006" }
+
 # Internal / Shared Modules
 firebase-auth = { module = "com.fluxzen:firebase-auth", version.ref = "firebaseAuthShared" }
 ui-design = { module = "com.fluxzen:ui-design", version.ref = "uiDesignShared" }

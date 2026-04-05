@@ -54,6 +54,7 @@ dependencies {
     
     // AI & Streaming
     implementation(libs.tensorflow.lite)
+    implementation(libs.tensorflow.lite.task.audio)
     implementation(libs.webrtc.android)
     
     // DI

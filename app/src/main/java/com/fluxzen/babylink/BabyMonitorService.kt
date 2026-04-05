@@ -3,9 +3,14 @@ package com.fluxzen.babylink
 import android.app.*
 import android.content.Intent
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.fluxzen.ui_design.sync.NearbyTransportLayer
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -16,10 +21,13 @@ class BabyMonitorService : Service() {
 
     private val notificationId = 1
     private val channelId = "baby_monitor_channel"
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private lateinit var audioPipeline: AudioProcessingPipeline
 
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
+        audioPipeline = AudioProcessingPipeline(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -31,8 +39,10 @@ class BabyMonitorService : Service() {
 
         startForeground(notificationId, notification)
 
-        // TODO: Initialize TFLite Cry Detection
-        // TODO: Initialize WebRTC Engine
+        audioPipeline.start(serviceScope) {
+            Log.i("BabyMonitorService", "Cry Detected! Initiating alert/stream...")
+            // Integrate with nearbyTransport or alert system here
+        }
         
         return START_STICKY
     }
@@ -51,6 +61,8 @@ class BabyMonitorService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        audioPipeline.stop()
+        serviceScope.cancel()
         nearbyTransport.stopAll()
     }
 }
