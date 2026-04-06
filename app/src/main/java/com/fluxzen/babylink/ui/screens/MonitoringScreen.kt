@@ -18,6 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fluxzen.babylink.BabyMonitorViewModel
+import com.fluxzen.ui_design.display.LocalThemeStrategy
+import com.fluxzen.ui_design.display.rememberThemeAnimations
 
 @Composable
 fun MonitoringScreen(
@@ -87,15 +89,14 @@ fun MonitoringScreen(
                 Spacer(modifier = Modifier.height(64.dp))
 
                 // Noise Meter (Visualizing Cry Detection Stage 2)
-                NoiseMeter(level = noiseLevel, accentColor = accentColor)
+                NoiseMeter(level = noiseLevel, accentColor = strategy.accentColor)
             }
 
             // Quick Actions & Stats Card
             strategy.Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                shape = RoundedCornerShape(32.dp),
+                    .padding(bottom = 16.dp)
             ) {
                 Row(
                     modifier = Modifier
@@ -127,7 +128,7 @@ fun MonitoringScreen(
 
                     // Connection Quality
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = "Strong", fontWeight = FontWeight.Bold, color = accentColor)
+                        Text(text = "Strong", fontWeight = FontWeight.Bold, color = strategy.accentColor)
                         Text(text = "Signal", style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.5f))
                     }
                 }

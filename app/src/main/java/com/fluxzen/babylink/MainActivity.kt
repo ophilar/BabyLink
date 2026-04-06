@@ -10,6 +10,8 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -63,14 +65,7 @@ class MainActivity : ComponentActivity() {
                         snackbarHost = { SnackbarHost(snackbarHostState) }
                     ) { paddingValues ->
                         Surface(modifier = androidx.compose.ui.Modifier.padding(paddingValues)) {
-                            NavDisplay(
-                                backStack = backStack,
-                                onBack = { backStack.removeLastOrNull() },
-                                transitionSearch = { _, _ ->
-                                    // Custom premium transitions
-                                    fadeIn(animationSpec = tween(500)) togetherWith fadeOut(animationSpec = tween(500))
-                                }
-                            ) { key ->
+                            val entries = backStack.map { key ->
                                 when (key) {
                                     RoleSelectionKey -> NavEntry(key) {
                                         RoleSelectionScreen(
@@ -100,6 +95,14 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             }
+
+                            NavDisplay(
+                                entries = entries,
+                                onBack = { backStack.removeLastOrNull() },
+                                transitionSpec = {
+                                    fadeIn(animationSpec = tween(500)) togetherWith fadeOut(animationSpec = tween(500))
+                                }
+                            )
                         }
                     }
                 }

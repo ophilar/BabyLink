@@ -7,6 +7,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.fluxzen.babylink.BabyMonitorViewModel
+import com.fluxzen.ui_design.display.LocalThemeStrategy
+import com.fluxzen.ui_design.display.rememberThemeAnimations
 
 @Composable
 fun RoleSelectionScreen(
@@ -28,18 +30,20 @@ fun RoleSelectionScreen(
         
         strategy.PrimaryButton(
             onClick = { onRoleSelected(true) },
-            modifier = Modifier.fillMaxWidth(0.7f)
-        ) {
-            Text("Baby Station (Sender)")
-        }
+            modifier = Modifier.fillMaxWidth(0.7f),
+            content = {
+                Text("Baby Station (Sender)")
+            }
+        )
         
         Spacer(modifier = Modifier.height(16.dp))
         
         strategy.SecondaryButton(
             onClick = { onRoleSelected(false) },
-            modifier = Modifier.fillMaxWidth(0.7f)
-        ) {
-            Text("Parent Station (Receiver)")
-        }
+            modifier = Modifier.fillMaxWidth(0.7f),
+            content = {
+                Text("Parent Station (Receiver)")
+            }
+        )
     }
 }

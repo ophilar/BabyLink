@@ -22,6 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fluxzen.babylink.BabyMonitorViewModel
+import com.fluxzen.ui_design.display.LocalThemeStrategy
+import com.fluxzen.ui_design.display.rememberThemeAnimations
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -153,8 +155,7 @@ data class LogEvent(val type: String, val timestamp: Long)
 @Composable
 fun InfoCard(label: String, value: String, icon: androidx.compose.ui.graphics.vector.ImageVector, modifier: Modifier, strategy: com.fluxzen.ui_design.display.ThemeStrategy) {
     strategy.Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(24.dp),
+        modifier = modifier
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Icon(icon, contentDescription = null, tint = strategy.accentColor, modifier = Modifier.size(24.dp))
