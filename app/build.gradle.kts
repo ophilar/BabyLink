@@ -2,7 +2,13 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ksp)
 }
+
+kotlin {
+    jvmToolchain(21)
+}
+
 
 android {
     namespace = "com.fluxzen.babylink"
@@ -28,41 +34,47 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "21"
-    }
     buildFeatures {
         compose = true
+    }
+    testOptions {
+        unitTests.all {
+            it.useJUnitPlatform()
+        }
     }
 }
 
 dependencies {
-    implementation(project(":ui-design"))
+    implementation(libs.ui.design)
     
+    // Core & Compose Bundle
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+    implementation(libs.bundles.compose)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.material)
     
     // Signaling
     implementation(libs.play.services.nearby)
     implementation(libs.gson)
     
     // AI & Streaming
-    implementation(libs.tensorflow.lite)
-    implementation(libs.tensorflow.lite.task.audio)
+    implementation(libs.mediapipe.tasks.audio)
     implementation(libs.webrtc.android)
     
-    // DI
-    implementation(libs.hilt.android)
+    // Navigation 3 & Adaptive UI
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.material3.windowsize)
+    
+    // DI (Hilt Bundle)
+    implementation(libs.bundles.hilt)
     ksp(libs.hilt.android.compiler)
     
-    // Testing
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    // Testing (Bundles & Junit5 Runtime)
+    testImplementation(libs.bundles.test.unit)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
+    androidTestImplementation(libs.bundles.test.android)
 }
+

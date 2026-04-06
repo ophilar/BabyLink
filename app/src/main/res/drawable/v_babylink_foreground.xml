@@ -1,0 +1,26 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Heartbeat Silhouette (BabyLink) -->
+    <!-- Nurturing Circle (Subtle) -->
+    <path
+        android:pathData="M54,24 A30,30 0 1 1 54,84 A30,30 0 1 1 54,24"
+        android:fillColor="#15FFFFFF" />
+        
+    <!-- Heartbeat Line (WarpCoreCyan to BioGreen) -->
+    <path
+        android:pathData="M24,54 L44,54 L49,40 L59,68 L64,54 L84,54"
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000" />
+        
+    <!-- Tiny Heart Point -->
+    <path
+        android:pathData="M54,48 A2,2 0 1 1 54,52 A2,2 0 1 1 54,48"
+        android:fillColor="#66BB6A" />
+</vector>

@@ -1,23 +1,45 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizard.settings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# IDE / Gradle / System
+.idea/
+.gradle/
+build/
 local.properties
-/app/build
-/ui-design/build
-.planning/
+.DS_Store
+
+# AI Tools
+repomix-output.*
 .Jules/
-**/build/
-**/node_modules/
-*.pyc
-__pycache__/
+
+# Build Outputs
+*.apk
+*.aar
+*.aab
+*.dex
+*.class
+bin/
+gen/
+out/
+build_output.txt
+test_output.txt
+test_failures.txt
+build_error.log
+
+# Crash Dumps
+*.hprof
+java_pid*
+
+# ML Models
+*.tflite
+
+# Google Services
+google-services.json
+app/google-services.json
+todola/google-services.json
+
+# Version Control Metadata
+vcs.xml
+lint/
+captures/
+.externalNativeBuild/
+.cxx/
+freeline/
+fastlane/

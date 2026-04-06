@@ -2,6 +2,8 @@ package com.fluxzen.babylink
 
 import android.app.*
 import android.content.Intent
+import android.content.pm.ServiceInfo
+import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -37,12 +39,19 @@ class BabyMonitorService : Service() {
             .setSmallIcon(android.R.drawable.ic_menu_compass)
             .build()
 
-        startForeground(notificationId, notification)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(notificationId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(notificationId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
+        } else {
+            startForeground(notificationId, notification)
+        }
 
         audioPipeline.start(serviceScope) {
-            Log.i("BabyMonitorService", "Cry Detected! Initiating alert/stream...")
-            // Integrate with nearbyTransport or alert system here
+            Log.i("BabyMonitorService", "Cry Detected! Initiating alert...")
+            nearbyTransport.broadcastMessage("cry_detected")
         }
+
         
         return START_STICKY
     }
