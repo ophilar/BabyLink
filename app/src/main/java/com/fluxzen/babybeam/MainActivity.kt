@@ -1,4 +1,4 @@
-package com.fluxzen.babylink
+package com.fluxzen.babybeam
 
 import android.Manifest
 import android.os.Build
@@ -21,10 +21,10 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
-import com.fluxzen.babylink.navigation.*
-import com.fluxzen.babylink.ui.screens.ListeningScreen
-import com.fluxzen.babylink.ui.screens.MonitoringScreen
-import com.fluxzen.babylink.ui.screens.RoleSelectionScreen
+import com.fluxzen.babybeam.navigation.*
+import com.fluxzen.babybeam.ui.screens.ListeningScreen
+import com.fluxzen.babybeam.ui.screens.MonitoringScreen
+import com.fluxzen.babybeam.ui.screens.RoleSelectionScreen
 import com.fluxzen.ui_design.audio.ProvideSoundManager
 import com.fluxzen.ui_design.display.ThemeProvider
 import com.fluxzen.ui_design.display.ThemeVariant
@@ -55,13 +55,13 @@ class MainActivity : ComponentActivity() {
             ) {
                 ProvideSoundManager {
                     val viewModel: BabyMonitorViewModel = viewModel()
-                    val backStack = remember { mutableStateListOf<BabyLinkNavKey>(RoleSelectionKey) }
+                    val backStack = remember { mutableStateListOf<BabyBeamNavKey>(RoleSelectionKey) }
 
                     AdaptiveNavScaffold(
                         items = emptyList(), // No bottom nav/rail for this simple flow yet
                         activeItemId = null,
                         windowSizeClass = windowSizeClass,
-                        title = "BabyLink",
+                        title = "BabyBeam",
                         snackbarHost = { SnackbarHost(snackbarHostState) }
                     ) { paddingValues ->
                         Surface(modifier = androidx.compose.ui.Modifier.padding(paddingValues)) {
@@ -130,3 +130,4 @@ class MainActivity : ComponentActivity() {
         permissionLauncher.launch(permissions.toTypedArray())
     }
 }
+

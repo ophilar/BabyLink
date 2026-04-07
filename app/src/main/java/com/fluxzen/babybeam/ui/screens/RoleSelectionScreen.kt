@@ -1,4 +1,4 @@
-package com.fluxzen.babylink.ui.screens
+package com.fluxzen.babybeam.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.fluxzen.babylink.BabyMonitorViewModel
+import com.fluxzen.babybeam.BabyMonitorViewModel
 import com.fluxzen.ui_design.display.LocalThemeStrategy
 import com.fluxzen.ui_design.display.rememberThemeAnimations
 
@@ -23,7 +23,7 @@ fun RoleSelectionScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "BabyLink", style = strategy.typography.headlineLarge, color = strategy.contentColor)
+        Text(text = "BabyBeam", style = strategy.typography.headlineLarge, color = strategy.contentColor)
         Spacer(modifier = Modifier.height(32.dp))
         Text(text = "Select Device Role", style = strategy.typography.titleMedium, color = strategy.contentColor.copy(alpha = 0.7f))
         Spacer(modifier = Modifier.height(16.dp))
@@ -47,3 +47,4 @@ fun RoleSelectionScreen(
         )
     }
 }
+

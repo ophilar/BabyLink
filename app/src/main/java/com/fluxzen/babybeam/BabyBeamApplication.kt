@@ -1,7 +1,8 @@
-package com.fluxzen.babylink
+package com.fluxzen.babybeam
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class BabyLinkApplication : Application()
+class BabyBeamApplication : Application()
+

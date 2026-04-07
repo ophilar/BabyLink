@@ -1,4 +1,4 @@
-package com.fluxzen.babylink
+package com.fluxzen.babybeam
 
 import com.fluxzen.ui_design.sync.NearbyTransportLayer
 import kotlinx.coroutines.Dispatchers
@@ -54,3 +54,4 @@ class BabyMonitorViewModelTest {
         assertFalse(viewModel.isCryDetected.first())
     }
 }
+

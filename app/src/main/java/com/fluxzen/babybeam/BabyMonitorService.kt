@@ -1,4 +1,4 @@
-package com.fluxzen.babylink
+package com.fluxzen.babybeam
 
 import android.app.*
 import android.content.Intent
@@ -75,3 +75,4 @@ class BabyMonitorService : Service() {
         nearbyTransport.stopAll()
     }
 }
+

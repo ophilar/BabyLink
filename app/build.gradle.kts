@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.gms)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 kotlin {
@@ -11,11 +13,11 @@ kotlin {
 
 
 android {
-    namespace = "com.fluxzen.babylink"
+    namespace = "com.fluxzen.babybeam"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.fluxzen.babylink"
+        applicationId = "com.fluxzen.babybeam"
         minSdk = 31
         targetSdk = 36
         versionCode = 1
@@ -53,6 +55,10 @@ dependencies {
     implementation(libs.bundles.compose)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.material)
+    
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.bundles.firebase)
     
     // Signaling
     implementation(libs.play.services.nearby)

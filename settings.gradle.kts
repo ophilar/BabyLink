@@ -26,5 +26,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "BabyLink"
+rootProject.name = "BabyBeam"
 include(":app")

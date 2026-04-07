@@ -1,4 +1,4 @@
-# BabyLink Project Roadmap
+# BabyBeam Project Roadmap
 
 ## Phase 1: Foundation & Build (COMPLETE)
 - [x] Scaffolding with Hilt & KSP.
@@ -23,3 +23,4 @@
 - [ ] **16KB Alignment migration** (LiteRT).
 - [ ] Release ProGuard/R8 hardening.
 - [ ] Google Play deployment metadata.
+

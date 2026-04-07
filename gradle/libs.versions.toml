@@ -3,7 +3,7 @@
 androidGradlePlugin = "9.1.0"
 kotlin = "2.3.20"
 ksp = "2.3.6"
-#googleServices = "4.4.4"
+googleServices = "4.4.4"
 
 # AndroidX Core & Lifecycle
 androidxActivity = "1.13.0"
@@ -18,6 +18,9 @@ androidxComposeBom = "2026.03.01"
 
 # Google Services
 playServicesNearby = "19.3.0"
+
+# Firebase
+firebaseBom = "34.11.0"
 
 # Dependency Injection (Hilt)
 hilt = "2.59.2"
@@ -49,6 +52,10 @@ compose = [
     "androidx-foundation-layout",
     "androidx-animation",
     "androidx-compose-runtime"
+]
+firebase = [
+    "firebase-analytics",
+    "firebase-crashlytics"
 ]
 hilt = [
     "hilt-android",
@@ -95,6 +102,15 @@ gson = { module = "com.google.code.gson:gson", version = "2.13.2" }
 mediapipe-tasks-audio = { group = "com.google.mediapipe", name = "tasks-audio", version = "0.10.33" }
 webrtc-android = { group = "io.github.webrtc-sdk", name = "android", version = "144.7559.01" }
 
+# Firebase
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
+
+# Hilt
+# Redacted for brevity as it's below line 125
+...
+
 # Hilt
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
@@ -122,3 +138,5 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+gms = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.6" }

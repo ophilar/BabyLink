@@ -4,7 +4,7 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
     
-    <!-- Heartbeat Silhouette (BabyLink) -->
+    <!-- Heartbeat Silhouette (BabyBeam) -->
     <!-- Nurturing Circle (Subtle) -->
     <path
         android:pathData="M54,24 A30,30 0 1 1 54,84 A30,30 0 1 1 54,24"
@@ -24,3 +24,4 @@
         android:pathData="M54,48 A2,2 0 1 1 54,52 A2,2 0 1 1 54,48"
         android:fillColor="#66BB6A" />
 </vector>
+

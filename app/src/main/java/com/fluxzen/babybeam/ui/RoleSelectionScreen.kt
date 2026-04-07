@@ -1,4 +1,4 @@
-package com.fluxzen.babylink.ui
+package com.fluxzen.babybeam.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -20,7 +20,7 @@ fun RoleSelectionScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Welcome to BabyLink",
+            text = "Welcome to BabyBeam",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 32.dp)
         )
@@ -42,3 +42,4 @@ fun RoleSelectionScreen(
         }
     }
 }
+

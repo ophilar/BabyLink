@@ -1,4 +1,4 @@
-package com.fluxzen.babylink.ui.screens
+package com.fluxzen.babybeam.ui.screens
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.fluxzen.babylink.BabyMonitorViewModel
+import com.fluxzen.babybeam.BabyMonitorViewModel
 import com.fluxzen.ui_design.display.LocalThemeStrategy
 import com.fluxzen.ui_design.display.rememberThemeAnimations
 
@@ -154,3 +154,4 @@ fun NoiseMeter(level: Float, accentColor: Color) {
         )
     }
 }
+

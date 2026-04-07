@@ -1,4 +1,4 @@
-package com.fluxzen.babylink.ui.screens
+package com.fluxzen.babybeam.ui.screens
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.fluxzen.babylink.BabyMonitorViewModel
+import com.fluxzen.babybeam.BabyMonitorViewModel
 import com.fluxzen.ui_design.display.LocalThemeStrategy
 import com.fluxzen.ui_design.display.rememberThemeAnimations
 import java.text.SimpleDateFormat
@@ -202,3 +202,4 @@ fun HistoryItem(event: LogEvent) {
         Text(text = sdf.format(Date(event.timestamp)), style = MaterialTheme.typography.bodySmall, color = Color.Gray)
     }
 }
+

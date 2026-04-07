@@ -1,4 +1,4 @@
-package com.fluxzen.babylink
+package com.fluxzen.babybeam
 
 import android.Manifest
 import android.content.Context
@@ -187,3 +187,4 @@ class AudioProcessingPipeline(private val context: Context) {
         Log.d(TAG, "AudioProcessingPipeline stopped.")
     }
 }
+

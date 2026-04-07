@@ -1,4 +1,4 @@
-# BabyLink Design Decisions
+# BabyBeam Design Decisions
 
 ## Architecture
 - **Framework**: MVVM + Hilt + KSP.
@@ -14,3 +14,4 @@
 ## Security & Privacy
 - **Zero Cloud**: No audio data leaves the local Wi-Fi/Bluetooth mesh.
 - **Local Logs**: Alerts are stored purely in memory or encrypted local storage (Tink).
+
