@@ -14,6 +14,11 @@
 - [ ] Audio Stream Processing (PCM Feeding).
 - [ ] Background Service persistence.
 
+## Phase 5: Zenith Design Language 🔄
+- [x] **Icon Modernization** - Implement Vector-Only adaptive icons.
+- [x] **Monochrome Compliance** - Strict Material You theming support.
+- [ ] **Zenith UI Strategy** - Apply organic flow to baby monitoring dashboard.
+
 ## Phase 3: UI & UX Polish
 - [ ] Interactive waveform visualization.
 - [ ] Lullaby synchronization across devices.
@@ -23,4 +28,3 @@
 - [ ] **16KB Alignment migration** (LiteRT).
 - [ ] Release ProGuard/R8 hardening.
 - [ ] Google Play deployment metadata.
-

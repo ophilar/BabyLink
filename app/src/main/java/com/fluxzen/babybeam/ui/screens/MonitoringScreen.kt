@@ -42,7 +42,7 @@ fun MonitoringScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .padding(strategy.screenPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Header
@@ -101,7 +101,7 @@ fun MonitoringScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(24.dp),
+                        .padding(strategy.cardPadding),
                     horizontalArrangement = Arrangement.SpaceAround,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -139,12 +139,13 @@ fun MonitoringScreen(
 
 @Composable
 fun NoiseMeter(level: Float, accentColor: Color) {
+    val strategy = LocalThemeStrategy.current
     Box(
         modifier = Modifier
             .fillMaxWidth(0.8f)
             .height(24.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color.White.copy(alpha = 0.1f))
+            .clip(RoundedCornerShape(strategy.cornerRadius / 2))
+            .background(strategy.contentColor.copy(alpha = 0.1f))
     ) {
         Box(
             modifier = Modifier

@@ -1,0 +1,35 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- BabyBeam v3: Lateral Sleep Profile Foreground -->
+    
+    <!-- Baby Silhouette Outline (Simplified side lying) -->
+    <path
+        android:pathData="M45,55C45,50 55,45 65,50C75,55 70,65 60,70C50,75 40,70 45,55"
+        android:strokeColor="#9575CD"
+        android:strokeWidth="2"/>
+        
+    <!-- Protective Curves (Non-intersecting) -->
+    <path
+        android:pathData="M35,45C45,40 65,40 75,45"
+        android:strokeColor="#64B5F6"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"/>
+        
+    <path
+        android:pathData="M30,55C40,50 70,50 80,55"
+        android:strokeColor="#4FC3F7"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"/>
+        
+    <!-- Outer curve with Wi-Fi integrated -->
+    <path
+        android:pathData="M25,65C40,60 70,60 85,65"
+        android:strokeColor="#03A9F4"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"/>
+        
+</vector>

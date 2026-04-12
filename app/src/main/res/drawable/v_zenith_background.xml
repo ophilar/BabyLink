@@ -1,0 +1,12 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Zenith Organic Squicle Background -->
+    <path
+        android:pathData="M54,0C24,0 0,24 0,54C0,84 24,108 54,108C84,108 108,84 108,54C108,24 84,0 54,0Z"
+        android:fillColor="#F5F5F5"/> <!-- Base off-white, apps will provide gradients -->
+        
+</vector>
