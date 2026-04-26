@@ -33,10 +33,22 @@ class BabyMonitorService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == "ACTION_STOP_SERVICE") {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+            stopSelf()
+            return START_NOT_STICKY
+        }
+        
+        val stopIntent = Intent(this, BabyMonitorService::class.java).apply {
+            action = "ACTION_STOP_SERVICE"
+        }
+        val stopPendingIntent = PendingIntent.getService(this, 0, stopIntent, PendingIntent.FLAG_IMMUTABLE)
+
         val notification = NotificationCompat.Builder(this, channelId)
             .setContentTitle("Baby Monitor Active")
             .setContentText("Monitoring for crying...")
             .setSmallIcon(android.R.drawable.ic_menu_compass)
+            .addAction(android.R.drawable.ic_delete, "Stop Transmission", stopPendingIntent)
             .build()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {

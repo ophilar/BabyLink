@@ -1,35 +1,85 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+
+    <!-- BabyBeam v3 (Ultra): Elegant Gradient-Enriched Adaptive Icon -->
     
-    <!-- BabyBeam v3: Lateral Sleep Profile Foreground -->
-    
-    <!-- Baby Silhouette Outline (Simplified side lying) -->
+    <!-- Protective Curves with Gradients -->
+    <!-- Top Curve -->
     <path
-        android:pathData="M45,55C45,50 55,45 65,50C75,55 70,65 60,70C50,75 40,70 45,55"
-        android:strokeColor="#9575CD"
-        android:strokeWidth="2"/>
+        android:pathData="M25,30C40,20 68,20 83,30"
+        android:strokeLineCap="round"
+        android:strokeWidth="3.5">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="25"
+                android:startY="25"
+                android:endX="83"
+                android:endY="25"
+                android:type="linear">
+                <item android:color="#B2EBF2" android:offset="0" />
+                <item android:color="#E0F7FA" android:offset="0.5" />
+                <item android:color="#B2EBF2" android:offset="1" />
+            </gradient>
+        </aapt:attr>
+    </path>
         
-    <!-- Protective Curves (Non-intersecting) -->
+    <!-- Middle Curve -->
     <path
-        android:pathData="M35,45C45,40 65,40 75,45"
-        android:strokeColor="#64B5F6"
-        android:strokeWidth="2"
-        android:strokeLineCap="round"/>
+        android:pathData="M20,54C30,45 78,45 88,54"
+        android:strokeLineCap="round"
+        android:strokeWidth="4">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="20"
+                android:startY="50"
+                android:endX="88"
+                android:endY="50"
+                android:type="linear">
+                <item android:color="#80DEEA" android:offset="0" />
+                <item android:color="#B2EBF2" android:offset="0.5" />
+                <item android:color="#80DEEA" android:offset="1" />
+            </gradient>
+        </aapt:attr>
+    </path>
         
+    <!-- Bottom Curve -->
     <path
-        android:pathData="M30,55C40,50 70,50 80,55"
-        android:strokeColor="#4FC3F7"
-        android:strokeWidth="2"
-        android:strokeLineCap="round"/>
-        
-    <!-- Outer curve with Wi-Fi integrated -->
+        android:pathData="M25,78C40,88 68,88 83,78"
+        android:strokeLineCap="round"
+        android:strokeWidth="3.5">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="25"
+                android:startY="83"
+                android:endX="83"
+                android:endY="83"
+                android:type="linear">
+                <item android:color="#4DD0E1" android:offset="0" />
+                <item android:color="#80DEEA" android:offset="0.5" />
+                <item android:color="#4DD0E1" android:offset="1" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Baby Profile (Glowing Highlight) -->
     <path
-        android:pathData="M25,65C40,60 70,60 85,65"
-        android:strokeColor="#03A9F4"
-        android:strokeWidth="2"
-        android:strokeLineCap="round"/>
+        android:pathData="M65,42C70,42 75,47 75,52C75,57 70,62 65,62C60,62 55,60 52,55C48,48 42,48 38,52C34,56 34,62 38,66C42,70 50,70 55,65"
+        android:strokeWidth="4"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"/>
         
+    <!-- Subtle Inner Glow to the Profile -->
+    <path
+        android:pathData="M65,42C70,42 75,47 75,52C75,57 70,62 65,62C60,62 55,60 52,55C48,48 42,48 38,52C34,56 34,62 38,66C42,70 50,70 55,65"
+        android:strokeWidth="1.5"
+        android:strokeColor="#CCFFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeAlpha="0.5"/>
+
 </vector>

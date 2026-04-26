@@ -1,0 +1,36 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Prismatic Constellation v2.4 (StellarUI) -->
+    <!-- Single Borderless LCARS Frame (SUI Palette) -->
+    <path
+        android:pathData="M10,20 c0,-6 6,-10 10,-10 h50 v12 h-50 c-2,0 -4,2 -4,4 v15 h-6 z"
+        android:fillColor="#8000E5FF" />
+    <path
+        android:pathData="M10,40 h6 v15 h-6 z"
+        android:fillColor="#80FF9100" />
+    <path
+        android:pathData="M98,88 c0,6 -6,10 -10,10 h-50 v-12 h50 c2,0 4,-2 4,-4 v-15 h6 z"
+        android:fillColor="#80651FFF" />
+    
+    <!-- Orion Constellation - Realistic Stellar Suns -->
+    <!-- Betelgeuse (Orange-Red) -->
+    <path android:pathData="M30,20 A4,4 0 1 1 30,28 A4,4 0 1 1 30,20" android:fillColor="#40FF9100" />
+    <path android:pathData="M31,21 A3,3 0 1 1 31,27 A3,3 0 1 1 31,21" android:fillColor="#FF9100" />
+    <!-- Bellatrix (Blue-White) -->
+    <path android:pathData="M70,25 A4,4 0 1 1 70,33 A4,4 0 1 1 70,25" android:fillColor="#4000E5FF" />
+    <path android:pathData="M71,26 A3,3 0 1 1 71,32 A3,3 0 1 1 71,26" android:fillColor="#00E5FF" />
+    <!-- Rigel (Bright Blue) -->
+    <path android:pathData="M80,75 A5,5 0 1 1 80,85 A5,5 0 1 1 80,75" android:fillColor="#402979FF" />
+    <path android:pathData="M81,76 A4,4 0 1 1 81,84 A4,4 0 1 1 81,76" android:fillColor="#2979FF" />
+    <!-- Saiph (Blue) -->
+    <path android:pathData="M40,80 A4,4 0 1 1 40,88 A4,4 0 1 1 40,80" android:fillColor="#402979FF" />
+    <path android:pathData="M41,81 A3,3 0 1 1 41,87 A3,3 0 1 1 41,81" android:fillColor="#2979FF" />
+    <!-- Orion's Belt -->
+    <path android:pathData="M50,45 A2,2 0 1 1 50,49 A2,2 0 1 1 50,45" android:fillColor="#FFFFFF" />
+    <path android:pathData="M55,50 A2,2 0 1 1 55,54 A2,2 0 1 1 55,50" android:fillColor="#FFFFFF" />
+    <path android:pathData="M60,55 A2,2 0 1 1 60,59 A2,2 0 1 1 60,55" android:fillColor="#FFFFFF" />
+</vector>

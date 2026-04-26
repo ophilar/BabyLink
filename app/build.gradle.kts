@@ -7,14 +7,14 @@ plugins {
     alias(libs.plugins.firebase.crashlytics)
 }
 
-kotlin {
-    jvmToolchain(21)
-}
-
 
 android {
     namespace = "com.fluxzen.babybeam"
     compileSdk = 36
+    
+    kotlin {
+        jvmToolchain(21)
+    }
 
     defaultConfig {
         applicationId = "com.fluxzen.babybeam"
@@ -33,8 +33,7 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        isCoreLibraryDesugaringEnabled = true
     }
     buildFeatures {
         compose = true
@@ -82,5 +81,6 @@ dependencies {
     testRuntimeOnly(libs.junit.jupiter.engine)
     testRuntimeOnly(libs.junit.platform.launcher)
     androidTestImplementation(libs.bundles.test.android)
+    coreLibraryDesugaring(libs.android.desugar.jdk)
 }
 

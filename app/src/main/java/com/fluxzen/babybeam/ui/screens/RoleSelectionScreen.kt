@@ -19,18 +19,26 @@ fun RoleSelectionScreen(
     val animations = rememberThemeAnimations()
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "BabyBeam", style = strategy.typography.headlineLarge, color = strategy.contentColor)
-        Spacer(modifier = Modifier.height(32.dp))
-        Text(text = "Select Device Role", style = strategy.typography.titleMedium, color = strategy.contentColor.copy(alpha = 0.7f))
+        // BabyBeam v3 Logo
+        androidx.compose.foundation.Image(
+            painter = androidx.compose.ui.res.painterResource(id = com.fluxzen.babybeam.R.drawable.v_babybeam_foreground),
+            contentDescription = "Logo",
+            modifier = Modifier.size(120.dp)
+        )
+        
         Spacer(modifier = Modifier.height(16.dp))
+        Text(text = "BabyBeam", style = strategy.typography.headlineLarge, color = strategy.contentColor)
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = "Select Device Role", style = strategy.typography.titleMedium, color = strategy.contentColor.copy(alpha = 0.7f))
+        Spacer(modifier = Modifier.height(32.dp))
         
         strategy.PrimaryButton(
             onClick = { onRoleSelected(true) },
-            modifier = Modifier.fillMaxWidth(0.7f),
+            modifier = Modifier.fillMaxWidth(0.8f),
             content = {
                 Text("Baby Station (Sender)")
             }
@@ -40,11 +48,31 @@ fun RoleSelectionScreen(
         
         strategy.SecondaryButton(
             onClick = { onRoleSelected(false) },
-            modifier = Modifier.fillMaxWidth(0.7f),
+            modifier = Modifier.fillMaxWidth(0.8f),
             content = {
                 Text("Parent Station (Receiver)")
             }
         )
+        
+        Spacer(modifier = Modifier.weight(1f))
+        
+        // Unwired component: StellarUI Badge
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(bottom = 16.dp)
+        ) {
+            Text(
+                text = "Powered by",
+                style = strategy.typography.labelSmall,
+                color = strategy.contentColor.copy(alpha = 0.5f)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            androidx.compose.foundation.Image(
+                painter = androidx.compose.ui.res.painterResource(id = com.fluxzen.babybeam.R.drawable.sui_badge),
+                contentDescription = "StellarUI",
+                modifier = Modifier.size(24.dp)
+            )
+        }
     }
 }
 

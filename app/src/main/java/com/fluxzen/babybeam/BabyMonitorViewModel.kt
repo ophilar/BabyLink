@@ -2,13 +2,12 @@ package com.fluxzen.babybeam
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
-import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fluxzen.ui_design.sync.NearbyTransportLayer
-import com.google.android.gms.nearby.connection.Payload
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.delay
@@ -71,7 +70,12 @@ class BabyMonitorViewModel @Inject constructor(
         }
         
         if (_vibrationEnabled.value) {
-            val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? android.os.VibratorManager
+                vibratorManager?.defaultVibrator ?: context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            } else {
+                context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            }
             vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE))
         }
     }
