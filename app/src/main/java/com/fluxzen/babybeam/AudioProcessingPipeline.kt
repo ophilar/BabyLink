@@ -164,12 +164,12 @@ class AudioProcessingPipeline(private val context: Context) {
 
     private fun calculateRMS(buffer: ShortArray): Double {
         if (buffer.isEmpty()) return 0.0
-        var sum = 0.0
-        for (sample in buffer) {
-            val s = sample.toDouble()
-            sum += s * s
+        var sumSq = 0L
+        for (i in buffer.indices) {
+            val s = buffer[i].toLong()
+            sumSq += s * s
         }
-        return sqrt(sum / buffer.size)
+        return sqrt(sumSq.toDouble() / buffer.size)
     }
 
     fun stop() {
