@@ -182,7 +182,7 @@ fun ControlButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label: 
 
 @Composable
 fun HistoryItem(event: LogEvent) {
-    val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
+    val sdf = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
