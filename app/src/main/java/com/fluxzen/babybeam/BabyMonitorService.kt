@@ -59,9 +59,11 @@ class BabyMonitorService : Service() {
             startForeground(notificationId, notification)
         }
 
+        val applicationContext = this.applicationContext
+
         audioPipeline.start(serviceScope) {
             Log.i("BabyMonitorService", "Cry Detected! Initiating alert...")
-            nearbyTransport.broadcastMessage("cry_detected")
+            nearbyTransport.broadcastMessage(SecurityUtil.generateSignedMessage(applicationContext, "cry_detected"))
         }
 
         
@@ -87,4 +89,3 @@ class BabyMonitorService : Service() {
         nearbyTransport.stopAll()
     }
 }
-

@@ -45,7 +45,8 @@ class BabyMonitorViewModel @Inject constructor(
                 when (event) {
                     is NearbyTransportLayer.TransportEvent.DataReceived -> {
                         val message = String(event.payload.asBytes() ?: byteArrayOf())
-                        if (message == "cry_detected") {
+                        val payload = SecurityUtil.verifySignedMessage(context, message)
+                        if (payload == "cry_detected") {
                             triggerAlert()
                         }
                     }
@@ -107,8 +108,3 @@ class BabyMonitorViewModel @Inject constructor(
         _isCryDetected.value = false
     }
 }
-
-
-
-
-
