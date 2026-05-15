@@ -34,6 +34,8 @@ class AudioProcessingPipeline(private val context: Context) {
     @Volatile private var isCurrentlyNoisy = false
     private var lastCryTime = 0L
     private val cryDebounceTimeMs = 5000L
+    private val knownCryIndices = mutableSetOf<Int>()
+    private val knownNonCryIndices = mutableSetOf<Int>()
 
     fun start(coroutineScope: CoroutineScope, onCryDetected: () -> Unit) {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -146,10 +148,23 @@ class AudioProcessingPipeline(private val context: Context) {
         val classifications = result.classificationResults().firstOrNull()?.classifications()?.firstOrNull()
         val categories = classifications?.categories() ?: return
 
-        // Look for "cry" or "baby crying"
+        // Look for "cry" or "baby crying" using dynamically built cache
         val cryCategory = categories.find { category: Category -> 
-            category.categoryName().contains("cry", ignoreCase = true) || 
-            category.displayName().contains("cry", ignoreCase = true) 
+            val idx = category.index()
+            if (knownCryIndices.contains(idx)) {
+                true
+            } else if (knownNonCryIndices.contains(idx)) {
+                false
+            } else {
+                val isCry = category.categoryName().contains("cry", ignoreCase = true) ||
+                            category.displayName().contains("cry", ignoreCase = true)
+                if (isCry) {
+                    knownCryIndices.add(idx)
+                } else {
+                    knownNonCryIndices.add(idx)
+                }
+                isCry
+            }
         }
 
         if (cryCategory != null && cryCategory.score() > 0.6f) {
