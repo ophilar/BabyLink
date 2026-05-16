@@ -24,13 +24,12 @@ import javax.inject.Inject
 @HiltViewModel
 class BabyMonitorViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
-    private val nearbyTransport: NearbyTransportLayer
+    private val nearbyTransport: NearbyTransportLayer,
+    val webRtcManager: WebRtcManager
 ) : ViewModel(), SignalingClient {
 
     private val TAG = "BabyMonitorViewModel"
     private val gson = Gson()
-
-    var webRtcManager: WebRtcManager? = null
 
     private var _isSender = false
 
@@ -63,14 +62,8 @@ class BabyMonitorViewModel @Inject constructor(
 
 
     init {
+        webRtcManager.signalingClient = this
         observeEvents()
-    }
-
-    private fun setupWebRtc() {
-        if (webRtcManager == null) {
-            webRtcManager = WebRtcManager(context, this)
-            WebRtcManagerHolder.webRtcManager = webRtcManager
-        }
     }
 
     private fun observeEvents() {
@@ -104,7 +97,7 @@ class BabyMonitorViewModel @Inject constructor(
                             _connectionStatus.value = "Connected"
                             if (!_isSender) {
                                 // Receiver connects to Sender. Receiver should start PC so it's ready.
-                                webRtcManager?.startPeerConnection()
+                                webRtcManager.startPeerConnection()
                             }
                         } else {
                             _connectionStatus.value = "Connection Failed"
@@ -120,17 +113,17 @@ class BabyMonitorViewModel @Inject constructor(
         when (msg.type) {
             "offer" -> {
                 msg.sdp?.let { sdp ->
-                    webRtcManager?.handleOffer(SessionDescription(SessionDescription.Type.OFFER, sdp))
+                    webRtcManager.handleOffer(SessionDescription(SessionDescription.Type.OFFER, sdp))
                 }
             }
             "answer" -> {
                 msg.sdp?.let { sdp ->
-                    webRtcManager?.handleAnswer(SessionDescription(SessionDescription.Type.ANSWER, sdp))
+                    webRtcManager.handleAnswer(SessionDescription(SessionDescription.Type.ANSWER, sdp))
                 }
             }
             "candidate" -> {
                 if (msg.sdp != null && msg.sdpMid != null && msg.sdpMLineIndex != null) {
-                    webRtcManager?.handleIceCandidate(IceCandidate(msg.sdpMid, msg.sdpMLineIndex, msg.sdp))
+                    webRtcManager.handleIceCandidate(IceCandidate(msg.sdpMid, msg.sdpMLineIndex, msg.sdp))
                 }
             }
             "toggle_light" -> msg.isOn?.let { _isNightLightOn.value = it }
@@ -186,8 +179,7 @@ class BabyMonitorViewModel @Inject constructor(
 
     fun startMonitoring(activityContext: Context) {
         _isSender = true
-        setupWebRtc()
-        webRtcManager?.startLocalVideoAndAudio()
+        webRtcManager.startLocalVideoAndAudio()
 
         val intent = Intent(activityContext, BabyMonitorService::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -205,12 +197,11 @@ class BabyMonitorViewModel @Inject constructor(
 
     fun startDiscovery() {
         _isSender = false
-        setupWebRtc()
         nearbyTransport.startDiscovery()
     }
 
     fun stop() {
-        webRtcManager?.stop()
+        webRtcManager.stop()
         nearbyTransport.stopAll()
         _connectionStatus.value = "Disconnected"
     }
@@ -233,8 +224,8 @@ class BabyMonitorViewModel @Inject constructor(
 
         if (_isSender) {
             // Once connected, Sender creates offer to start WebRTC
-            webRtcManager?.startPeerConnection()
-            webRtcManager?.createOffer()
+            webRtcManager.startPeerConnection()
+            webRtcManager.createOffer()
         }
     }
 

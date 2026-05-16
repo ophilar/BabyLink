@@ -21,20 +21,16 @@ class BabyMonitorService : Service() {
     @Inject
     lateinit var nearbyTransport: NearbyTransportLayer
 
-    // In a real app we'd inject this via Hilt, but for now we'll get it from the Application or a Singleton holding it.
-    // Wait, the viewmodel creates WebRtcManager? Actually let's assume it's created and managed somewhere accessible.
-    // I will refactor to use a simple static reference or pass it around since Hilt module isn't set up for it yet.
-    // Let's create a global holder for simplicity in this task.
+    @Inject
+    lateinit var audioPipeline: AudioProcessingPipeline
 
     private val notificationId = 1
     private val channelId = "baby_monitor_channel"
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private lateinit var audioPipeline: AudioProcessingPipeline
 
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        // audioPipeline = AudioProcessingPipeline(this, WebRtcManagerHolder.webRtcManager!!)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -66,12 +62,9 @@ class BabyMonitorService : Service() {
 
         val applicationContext = this.applicationContext
 
-        WebRtcManagerHolder.webRtcManager?.let { manager ->
-            audioPipeline = AudioProcessingPipeline(this, manager)
-            audioPipeline.start(serviceScope) {
-                Log.i("BabyMonitorService", "Cry Detected! Initiating alert...")
-                nearbyTransport.broadcastMessage(SecurityUtil.generateSignedMessage(applicationContext, "cry_detected"))
-            }
+        audioPipeline.start(serviceScope) {
+            Log.i("BabyMonitorService", "Cry Detected! Initiating alert...")
+            nearbyTransport.broadcastMessage(SecurityUtil.generateSignedMessage(applicationContext, "cry_detected"))
         }
         
         return START_STICKY
@@ -91,14 +84,8 @@ class BabyMonitorService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (::audioPipeline.isInitialized) {
-            audioPipeline.stop()
-        }
+        audioPipeline.stop()
         serviceScope.cancel()
         nearbyTransport.stopAll()
     }
-}
-
-object WebRtcManagerHolder {
-    var webRtcManager: WebRtcManager? = null
 }

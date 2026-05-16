@@ -2,14 +2,23 @@ package com.fluxzen.babybeam
 
 import android.content.Context
 import android.util.Log
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.webrtc.*
 import org.webrtc.audio.JavaAudioDeviceModule
 import java.util.Collections
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class WebRtcManager(private val context: Context, private val signalingClient: SignalingClient) : PeerConnection.Observer {
+@Singleton
+class WebRtcManager @Inject constructor(
+    @ApplicationContext private val context: Context
+) : PeerConnection.Observer {
     private val TAG = "WebRtcManager"
+
+    var signalingClient: SignalingClient? = null
+
     private var factory: PeerConnectionFactory? = null
     var peerConnection: PeerConnection? = null
     var localVideoTrack: VideoTrack? = null
@@ -93,7 +102,7 @@ class WebRtcManager(private val context: Context, private val signalingClient: S
         peerConnection?.createOffer(object : SdpObserver {
             override fun onCreateSuccess(sdp: SessionDescription?) {
                 peerConnection?.setLocalDescription(this, sdp)
-                sdp?.let { signalingClient.sendOffer(it) }
+                sdp?.let { signalingClient?.sendOffer(it) }
             }
             override fun onSetSuccess() {}
             override fun onCreateFailure(error: String?) { Log.e(TAG, "Create offer failed: $error") }
@@ -105,7 +114,7 @@ class WebRtcManager(private val context: Context, private val signalingClient: S
         peerConnection?.createAnswer(object : SdpObserver {
             override fun onCreateSuccess(sdp: SessionDescription?) {
                 peerConnection?.setLocalDescription(this, sdp)
-                sdp?.let { signalingClient.sendAnswer(it) }
+                sdp?.let { signalingClient?.sendAnswer(it) }
             }
             override fun onSetSuccess() {}
             override fun onCreateFailure(error: String?) { Log.e(TAG, "Create answer failed: $error") }
@@ -169,7 +178,7 @@ class WebRtcManager(private val context: Context, private val signalingClient: S
     override fun onIceConnectionReceivingChange(receiving: Boolean) {}
     override fun onIceGatheringChange(state: PeerConnection.IceGatheringState?) {}
     override fun onIceCandidate(candidate: IceCandidate?) {
-        candidate?.let { signalingClient.sendIceCandidate(it) }
+        candidate?.let { signalingClient?.sendIceCandidate(it) }
     }
     override fun onIceCandidatesRemoved(candidates: Array<out IceCandidate>?) {}
     override fun onAddStream(stream: MediaStream?) {

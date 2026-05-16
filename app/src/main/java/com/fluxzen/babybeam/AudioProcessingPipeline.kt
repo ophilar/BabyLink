@@ -11,14 +11,21 @@ import com.google.mediapipe.tasks.components.containers.AudioData
 import com.google.mediapipe.tasks.components.containers.Category
 import com.google.mediapipe.tasks.core.BaseOptions
 import com.google.mediapipe.tasks.core.Delegate
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import org.webrtc.audio.JavaAudioDeviceModule
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.math.log10
 import kotlin.math.sqrt
 
-class AudioProcessingPipeline(private val context: Context, private val webRtcManager: WebRtcManager) {
+@Singleton
+class AudioProcessingPipeline @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val webRtcManager: WebRtcManager
+) {
     private val TAG = "AudioProcessingPipeline"
     private var job: Job? = null
     private var audioClassifier: AudioClassifier? = null
