@@ -1,5 +1,9 @@
 package com.fluxzen.babybeam.ui.screens
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -17,6 +21,24 @@ fun RoleSelectionScreen(
 ) {
     val strategy = LocalThemeStrategy.current
     val animations = rememberThemeAnimations()
+
+    val senderPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val allGranted = permissions.entries.all { it.value }
+        if (allGranted) {
+            onRoleSelected(true)
+        }
+    }
+
+    val receiverPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val allGranted = permissions.entries.all { it.value }
+        if (allGranted) {
+            onRoleSelected(false)
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -37,7 +59,22 @@ fun RoleSelectionScreen(
         Spacer(modifier = Modifier.height(32.dp))
         
         strategy.PrimaryButton(
-            onClick = { onRoleSelected(true) },
+            onClick = {
+                val permissions = mutableListOf(
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    permissions.add(Manifest.permission.NEARBY_WIFI_DEVICES)
+                    permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    permissions.add(Manifest.permission.BLUETOOTH_ADVERTISE)
+                    permissions.add(Manifest.permission.BLUETOOTH_CONNECT)
+                }
+                senderPermissionLauncher.launch(permissions.toTypedArray())
+            },
             modifier = Modifier.fillMaxWidth(0.8f),
             content = {
                 Text("Baby Station (Sender)")
@@ -47,7 +84,20 @@ fun RoleSelectionScreen(
         Spacer(modifier = Modifier.height(16.dp))
         
         strategy.SecondaryButton(
-            onClick = { onRoleSelected(false) },
+            onClick = {
+                val permissions = mutableListOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    permissions.add(Manifest.permission.NEARBY_WIFI_DEVICES)
+                    permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    permissions.add(Manifest.permission.BLUETOOTH_SCAN)
+                    permissions.add(Manifest.permission.BLUETOOTH_CONNECT)
+                }
+                receiverPermissionLauncher.launch(permissions.toTypedArray())
+            },
             modifier = Modifier.fillMaxWidth(0.8f),
             content = {
                 Text("Parent Station (Receiver)")
@@ -75,4 +125,3 @@ fun RoleSelectionScreen(
         }
     }
 }
-

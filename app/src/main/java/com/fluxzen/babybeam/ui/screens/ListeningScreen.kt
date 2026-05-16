@@ -21,9 +21,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.fluxzen.babybeam.BabyMonitorViewModel
 import com.fluxzen.ui_design.display.LocalThemeStrategy
 import com.fluxzen.ui_design.display.rememberThemeAnimations
+import org.webrtc.RendererCommon
+import org.webrtc.SurfaceViewRenderer
+import org.webrtc.VideoTrack
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -39,16 +43,16 @@ fun ListeningScreen(
     // Mock data
     val roomTemp = 21
     val roomHumidity = 45
-    val historyEvents = remember {
-        mutableStateListOf(
-            LogEvent("Cry Detected", System.currentTimeMillis() - 3600000),
-            LogEvent("Motion Alert", System.currentTimeMillis() - 7200000)
-        )
-    }
+
     val isCryDetected by viewModel.isCryDetected.collectAsState()
     val vibrationEnabled by viewModel.vibrationEnabled.collectAsState()
     val visualAlertEnabled by viewModel.visualAlertEnabled.collectAsState()
     val connectionStatus by viewModel.connectionStatus.collectAsState()
+    val remoteVideoTrack by viewModel.webRtcManager?.remoteVideoTrackFlow?.collectAsState(initial = null) ?: remember { mutableStateOf(null) }
+
+    val isLightOn by viewModel.isNightLightOn.collectAsState()
+    val isMicActive by viewModel.isMicActive.collectAsState()
+    val isLullabyPlaying by viewModel.isLullabyPlaying.collectAsState()
 
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val alpha by infiniteTransition.animateFloat(
@@ -100,10 +104,14 @@ fun ListeningScreen(
                         .fillMaxWidth()
                         .height(200.dp)
                         .clip(RoundedCornerShape(32.dp))
-                        .background(Color.Black), // Live stream window usually stays black
+                        .background(Color.Black),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("LIVE AUDIO STREAM", color = Color.White.copy(alpha = 0.5f))
+                    if (remoteVideoTrack != null) {
+                        VideoRenderer(videoTrack = remoteVideoTrack!!, eglBaseContext = viewModel.webRtcManager!!.getEglBaseContext())
+                    } else {
+                        Text("WAITING FOR VIDEO", color = Color.White.copy(alpha = 0.5f))
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -116,9 +124,27 @@ fun ListeningScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-                    ControlButton(icon = Icons.Default.Mic, label = "Talk", strategy = strategy)
-                    ControlButton(icon = Icons.Default.MusicNote, label = "Lullaby", strategy = strategy)
-                    ControlButton(icon = Icons.Default.Lightbulb, label = "Light", strategy = strategy)
+                    ControlButton(
+                        icon = Icons.Default.Mic,
+                        label = "Talk",
+                        isActive = isMicActive,
+                        onClick = { viewModel.toggleMic() },
+                        strategy = strategy
+                    )
+                    ControlButton(
+                        icon = Icons.Default.MusicNote,
+                        label = "Lullaby",
+                        isActive = isLullabyPlaying,
+                        onClick = { viewModel.toggleLullaby() },
+                        strategy = strategy
+                    )
+                    ControlButton(
+                        icon = Icons.Default.Lightbulb,
+                        label = "Light",
+                        isActive = isLightOn,
+                        onClick = { viewModel.toggleNightLight() },
+                        strategy = strategy
+                    )
                 }
             }
         }
@@ -155,6 +181,21 @@ fun ListeningScreen(
     }
 }
 
+@Composable
+fun VideoRenderer(videoTrack: VideoTrack, eglBaseContext: org.webrtc.EglBase.Context) {
+    AndroidView(
+        factory = { context ->
+            SurfaceViewRenderer(context).apply {
+                init(eglBaseContext, null)
+                setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
+                setEnableHardwareScaler(true)
+                videoTrack.addSink(this)
+            }
+        },
+        modifier = Modifier.fillMaxSize()
+    )
+}
+
 
 data class LogEvent(val type: String, val timestamp: Long)
 
@@ -173,39 +214,19 @@ fun InfoCard(label: String, value: String, icon: androidx.compose.ui.graphics.ve
 }
 
 @Composable
-fun ControlButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, strategy: com.fluxzen.ui_design.display.ThemeStrategy) {
+fun ControlButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, isActive: Boolean, onClick: () -> Unit, strategy: com.fluxzen.ui_design.display.ThemeStrategy) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         strategy.SecondaryButton(
-            onClick = { /* Action */ },
-            modifier = Modifier
-                .size(56.dp)
+            onClick = onClick,
+            modifier = Modifier.size(56.dp)
         ) {
-            Icon(icon, contentDescription = label, tint = strategy.accentColor)
+            Icon(
+                icon,
+                contentDescription = label,
+                tint = if (isActive) strategy.backgroundColor else strategy.accentColor,
+                modifier = Modifier.background(if (isActive) strategy.accentColor else Color.Transparent, CircleShape)
+            )
         }
         Text(text = label, style = strategy.typography.labelSmall, color = strategy.contentColor, modifier = Modifier.padding(top = 4.dp))
     }
 }
-
-@Composable
-fun HistoryItem(event: LogEvent) {
-    val sdf = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color.White)
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .size(8.dp)
-                .clip(CircleShape)
-                .background(Color(0xFF4CAF50))
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(text = event.type, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
-        Text(text = sdf.format(Date(event.timestamp)), style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-    }
-}
-

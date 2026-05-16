@@ -37,7 +37,8 @@ fun MonitoringScreen(
     val temperature = 21
     val humidity = 45
     val noiseLevel = 0.2f // Normalized 0.0 to 1.0
-    var isNightLightOn by remember { mutableStateOf(false) }
+
+    val isNightLightOn by viewModel.isNightLightOn.collectAsState()
 
     val pendingConnections by viewModel.pendingConnections.collectAsState()
     val connectedDevices by viewModel.connectedDevices.collectAsState()
@@ -124,7 +125,7 @@ fun MonitoringScreen(
 
                     // Night Light Toggle
                     IconButton(
-                        onClick = { isNightLightOn = !isNightLightOn },
+                        onClick = { viewModel.toggleNightLight() },
                         modifier = Modifier
                             .size(64.dp)
                             .clip(CircleShape)
@@ -215,4 +216,3 @@ fun NoiseMeter(level: Float, accentColor: Color) {
         )
     }
 }
-
