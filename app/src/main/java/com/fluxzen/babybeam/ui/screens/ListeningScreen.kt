@@ -209,3 +209,29 @@ fun HistoryItem(event: LogEvent) {
     }
 }
 
+
+
+data class LogEvent(val type: String, val timestamp: Long)
+
+@Composable
+fun HistoryItem(event: LogEvent) {
+    val sdf = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color.White)
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(8.dp)
+                .clip(CircleShape)
+                .background(Color(0xFF4CAF50))
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(text = event.type, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+        Text(text = sdf.format(Date(event.timestamp)), style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+    }
+}
