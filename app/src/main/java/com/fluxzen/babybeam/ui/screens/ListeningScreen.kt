@@ -48,6 +48,7 @@ fun ListeningScreen(
     val isCryDetected by viewModel.isCryDetected.collectAsState()
     val vibrationEnabled by viewModel.vibrationEnabled.collectAsState()
     val visualAlertEnabled by viewModel.visualAlertEnabled.collectAsState()
+    val connectionStatus by viewModel.connectionStatus.collectAsState()
 
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val alpha by infiniteTransition.animateFloat(
@@ -65,7 +66,12 @@ fun ListeningScreen(
             containerColor = Color.Transparent,
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = { Text("BABY MONITOR", style = strategy.typography.titleSmall, letterSpacing = 2.sp, color = strategy.contentColor) },
+                    title = {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("BABY MONITOR", style = strategy.typography.titleSmall, letterSpacing = 2.sp, color = strategy.contentColor)
+                            Text(connectionStatus, style = MaterialTheme.typography.bodySmall, color = strategy.accentColor)
+                        }
+                    },
                     navigationIcon = {
                         IconButton(onClick = onBack) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -158,7 +164,7 @@ fun InfoCard(label: String, value: String, icon: androidx.compose.ui.graphics.ve
         modifier = modifier
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Icon(icon, contentDescription = null, tint = strategy.accentColor, modifier = Modifier.size(24.dp))
+            Icon(icon, contentDescription = label, tint = strategy.accentColor, modifier = Modifier.size(24.dp))
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = value, fontWeight = FontWeight.Bold, fontSize = 20.sp, color = strategy.contentColor)
             Text(text = label, style = strategy.typography.bodySmall, color = strategy.contentColor.copy(alpha = 0.5f))
