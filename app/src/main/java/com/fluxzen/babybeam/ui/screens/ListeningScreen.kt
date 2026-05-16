@@ -15,6 +15,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
@@ -84,9 +86,17 @@ fun ListeningScreen(
                     actions = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text("Vib", style = MaterialTheme.typography.labelSmall)
-                            Switch(checked = vibrationEnabled, onCheckedChange = { viewModel.setVibration(it) }, modifier = Modifier.scale(0.7f))
+                            Switch(
+                                checked = vibrationEnabled,
+                                onCheckedChange = { viewModel.setVibration(it) },
+                                modifier = Modifier.semantics { contentDescription = "Toggle Vibration" }.scale(0.7f)
+                            )
                             Text("Vis", style = MaterialTheme.typography.labelSmall)
-                            Switch(checked = visualAlertEnabled, onCheckedChange = { viewModel.setVisualAlert(it) }, modifier = Modifier.scale(0.7f))
+                            Switch(
+                                checked = visualAlertEnabled,
+                                onCheckedChange = { viewModel.setVisualAlert(it) },
+                                modifier = Modifier.semantics { contentDescription = "Toggle Visual Alert" }.scale(0.7f)
+                            )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
