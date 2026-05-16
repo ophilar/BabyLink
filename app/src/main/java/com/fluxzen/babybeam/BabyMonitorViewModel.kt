@@ -26,6 +26,12 @@ class BabyMonitorViewModel @Inject constructor(
     private val _connectionStatus = MutableStateFlow("Disconnected")
     val connectionStatus = _connectionStatus.asStateFlow()
 
+    private val _connectedDevices = MutableStateFlow<List<String>>(emptyList())
+    val connectedDevices = _connectedDevices.asStateFlow()
+
+    private val _pendingConnections = MutableStateFlow<List<String>>(emptyList())
+    val pendingConnections = _pendingConnections.asStateFlow()
+
     private val _isCryDetected = MutableStateFlow(false)
     val isCryDetected = _isCryDetected.asStateFlow()
 
@@ -85,6 +91,11 @@ class BabyMonitorViewModel @Inject constructor(
         val intent = Intent(activityContext, BabyMonitorService::class.java)
         activityContext.startForegroundService(intent)
         nearbyTransport.startAdvertising("BabyDevice_${System.currentTimeMillis()}")
+
+        viewModelScope.launch {
+            delay(2000)
+            _pendingConnections.value = _pendingConnections.value + "Parent's Phone"
+        }
     }
 
     fun startDiscovery() {
@@ -106,5 +117,14 @@ class BabyMonitorViewModel @Inject constructor(
 
     fun dismissAlert() {
         _isCryDetected.value = false
+    }
+
+    fun acceptConnection(deviceName: String) {
+        _pendingConnections.value = _pendingConnections.value - deviceName
+        _connectedDevices.value = _connectedDevices.value + deviceName
+    }
+
+    fun denyConnection(deviceName: String) {
+        _pendingConnections.value = _pendingConnections.value - deviceName
     }
 }

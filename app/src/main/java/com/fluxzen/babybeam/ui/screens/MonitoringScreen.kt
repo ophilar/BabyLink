@@ -1,12 +1,16 @@
 package com.fluxzen.babybeam.ui.screens
 
 import androidx.compose.animation.*
+
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Nightlight
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Radar
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -33,7 +37,14 @@ fun MonitoringScreen(
     val temperature = 21
     val humidity = 45
     val noiseLevel = 0.2f // Normalized 0.0 to 1.0
-    val isNightLightOn by remember { mutableStateOf(false) }
+    var isNightLightOn by remember { mutableStateOf(false) }
+
+    val pendingConnections by viewModel.pendingConnections.collectAsState()
+    val connectedDevices by viewModel.connectedDevices.collectAsState()
+    val connectionStatus by viewModel.connectionStatus.collectAsState()
+
+    var showDevicesDialog by remember { mutableStateOf(false) }
+
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -60,8 +71,8 @@ fun MonitoringScreen(
                 
                 IconButton(onClick = onBack) {
                     Icon(
-                        imageVector = Icons.Default.Radar,
-                        contentDescription = "Status",
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Navigate back",
                         tint = strategy.accentColor
                     )
                 }
@@ -113,7 +124,7 @@ fun MonitoringScreen(
 
                     // Night Light Toggle
                     IconButton(
-                        onClick = { /* Toggle light */ },
+                        onClick = { isNightLightOn = !isNightLightOn },
                         modifier = Modifier
                             .size(64.dp)
                             .clip(CircleShape)
@@ -121,18 +132,67 @@ fun MonitoringScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Nightlight,
-                            contentDescription = "Night Light",
+                            contentDescription = if (isNightLightOn) "Turn night light off" else "Turn night light on",
                             tint = if (isNightLightOn) strategy.backgroundColor else strategy.accentColor
                         )
                     }
 
                     // Connection Quality
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = "Strong", fontWeight = FontWeight.Bold, color = strategy.accentColor)
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.clickable(
+                            onClickLabel = "View connected devices",
+                            role = Role.Button,
+                            onClick = { showDevicesDialog = true }
+                        )
+                    ) {
+                        Text(text = connectionStatus, fontWeight = FontWeight.Bold, color = strategy.accentColor)
                         Text(text = "Signal", style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.5f))
                     }
                 }
             }
+
+        // Connection Dialogs
+        pendingConnections.firstOrNull()?.let { pendingDevice ->
+            AlertDialog(
+                onDismissRequest = { viewModel.denyConnection(pendingDevice) },
+                title = { Text("Connection Request") },
+                text = { Text("$pendingDevice wants to connect.") },
+                confirmButton = {
+                    TextButton(onClick = { viewModel.acceptConnection(pendingDevice) }) {
+                        Text("Allow")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { viewModel.denyConnection(pendingDevice) }) {
+                        Text("Deny")
+                    }
+                }
+            )
+        }
+
+        if (showDevicesDialog) {
+            AlertDialog(
+                onDismissRequest = { showDevicesDialog = false },
+                title = { Text("Connected Devices") },
+                text = {
+                    if (connectedDevices.isEmpty()) {
+                        Text("No devices connected.")
+                    } else {
+                        Column {
+                            connectedDevices.forEach { device ->
+                                Text(device, modifier = Modifier.padding(vertical = 4.dp))
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { showDevicesDialog = false }) {
+                        Text("Close")
+                    }
+                }
+            )
+        }
         }
     }
 }
