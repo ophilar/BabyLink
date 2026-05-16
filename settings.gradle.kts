@@ -15,11 +15,26 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
+// 1. Explicitly resolve FluxZenShared based on environment
+val isCI = System.getenv("GITHUB_ACTIONS") == "true"
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
+        
+        if (isCI) {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/ophilar/FluxZenShared")
+                credentials {
+                    username = System.getenv("GPR_USER")
+                    password = System.getenv("GPR_TOKEN")
+                }
+            }
+        }
+        
         maven { url = uri("https://jitpack.io") }
     }
 }
@@ -27,25 +42,23 @@ dependencyResolutionManagement {
 rootProject.name = "BabyBeam"
 include(":app")
 
-// 1. Explicitly resolve FluxZenShared based on environment
-val isCI = System.getenv("GITHUB_ACTIONS") == "true"
-val fluxZenDir = if (isCI) {
-    file("FluxZenShared") // Submodule in CI
-} else {
+if (!isCI) {
     val localProperties = java.util.Properties().apply {
         val localFile = file("local.properties")
         if (localFile.exists()) {
             localFile.inputStream().use { load(it) }
         }
     }
-    localProperties.getProperty("fluxzen.dir")?.let { file(it) }
-}
-
-if (fluxZenDir != null && fluxZenDir.exists()) {
-    includeBuild(fluxZenDir) {
-        dependencySubstitution {
-            substitute(module("com.fluxzen:ui-design")).using(project(":ui-design"))
-            substitute(module("com.fluxzen:firebase-auth")).using(project(":firebase-auth"))
+    val fluxZenDir = localProperties.getProperty("fluxzen.dir")?.let { file(it) }
+    
+    if (fluxZenDir != null && fluxZenDir.exists()) {
+        includeBuild(fluxZenDir) {
+            dependencySubstitution {
+                substitute(module("com.fluxzen:ui-design")).using(project(":ui-design"))
+                substitute(module("com.fluxzen:firebase-auth")).using(project(":firebase-auth"))
+            }
         }
+    } else {
+        logger.warn("FluxZenShared directory not found. Local composite build disabled. Set 'fluxzen.dir' in local.properties.")
     }
 }
