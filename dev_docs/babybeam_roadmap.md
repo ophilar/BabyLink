@@ -25,6 +25,7 @@
 - [ ] Night mode / Light sensor triggers.
 
 ## Phase 4: Production Alignment
+- [x] **Zero-Maintenance Pattern** - Local/Remote source alignment for `FluxZenShared`.
 - [ ] **16KB Alignment migration** (LiteRT).
 - [ ] Release ProGuard/R8 hardening.
 - [ ] Google Play deployment metadata.

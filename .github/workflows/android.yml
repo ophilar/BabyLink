@@ -26,6 +26,3 @@ jobs:
 
     - name: Build with Gradle
       run: ./gradlew assembleDebug
-      env:
-        GPR_USER: ${{ github.actor }}
-        GPR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
