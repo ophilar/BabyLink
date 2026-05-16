@@ -21,15 +21,16 @@ class BabyMonitorService : Service() {
     @Inject
     lateinit var nearbyTransport: NearbyTransportLayer
 
+    @Inject
+    lateinit var audioPipeline: AudioProcessingPipeline
+
     private val notificationId = 1
     private val channelId = "baby_monitor_channel"
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private lateinit var audioPipeline: AudioProcessingPipeline
 
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        audioPipeline = AudioProcessingPipeline(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -52,9 +53,9 @@ class BabyMonitorService : Service() {
             .build()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            startForeground(notificationId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(notificationId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
+            startForeground(notificationId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE or ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            startForeground(notificationId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE or ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA)
         } else {
             startForeground(notificationId, notification)
         }
@@ -65,7 +66,6 @@ class BabyMonitorService : Service() {
             Log.i("BabyMonitorService", "Cry Detected! Initiating alert...")
             nearbyTransport.broadcastMessage(SecurityUtil.generateSignedMessage(applicationContext, "cry_detected"))
         }
-
         
         return START_STICKY
     }

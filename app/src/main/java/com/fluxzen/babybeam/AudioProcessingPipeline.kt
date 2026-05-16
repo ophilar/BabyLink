@@ -11,24 +11,25 @@ import com.google.mediapipe.tasks.components.containers.AudioData
 import com.google.mediapipe.tasks.components.containers.Category
 import com.google.mediapipe.tasks.core.BaseOptions
 import com.google.mediapipe.tasks.core.Delegate
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
-import org.webrtc.*
 import org.webrtc.audio.JavaAudioDeviceModule
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.math.log10
 import kotlin.math.sqrt
 
-class AudioProcessingPipeline(private val context: Context) {
+@Singleton
+class AudioProcessingPipeline @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val webRtcManager: WebRtcManager
+) {
     private val TAG = "AudioProcessingPipeline"
     private var job: Job? = null
     private var audioClassifier: AudioClassifier? = null
     
-    private var factory: PeerConnectionFactory? = null
-    private var audioSource: AudioSource? = null
-    private var localAudioTrack: AudioTrack? = null
-    private var audioDeviceModule: JavaAudioDeviceModule? = null
-
     private val sampleRate = 16000
     private val dbThreshold = 45.0 // Decibel threshold for gating
     @Volatile private var isCurrentlyNoisy = false
@@ -45,7 +46,9 @@ class AudioProcessingPipeline(private val context: Context) {
 
         job = coroutineScope.launch(Dispatchers.IO) {
             initMediaPipe(onCryDetected)
-            startWebRTCPipeline()
+            webRtcManager.onAudioSamplesReady = { audioSamples ->
+                processAudioSamples(audioSamples)
+            }
         }
     }
 
@@ -69,41 +72,6 @@ class AudioProcessingPipeline(private val context: Context) {
             Log.d(TAG, "MediaPipe AudioClassifier initialized (16KB compliant).")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to initialize MediaPipe: ${e.message}")
-        }
-    }
-
-    private fun startWebRTCPipeline() {
-        try {
-            PeerConnectionFactory.initialize(
-                PeerConnectionFactory.InitializationOptions.builder(context)
-                    .setEnableInternalTracer(true)
-                    .createInitializationOptions()
-            )
-
-            audioDeviceModule = JavaAudioDeviceModule.builder(context)
-                .setUseHardwareAcousticEchoCanceler(true)
-                .setUseHardwareNoiseSuppressor(true)
-                .setSamplesReadyCallback { audioSamples ->
-                    processAudioSamples(audioSamples)
-                }
-                .createAudioDeviceModule()
-
-            factory = PeerConnectionFactory.builder()
-                .setAudioDeviceModule(audioDeviceModule)
-                .createPeerConnectionFactory()
-
-            val audioConstraints = MediaConstraints()
-            audioConstraints.mandatory.add(MediaConstraints.KeyValuePair("googHighpassFilter", "true"))
-            audioConstraints.mandatory.add(MediaConstraints.KeyValuePair("googAutoGainControl", "true"))
-            audioConstraints.mandatory.add(MediaConstraints.KeyValuePair("googNoiseSuppression", "true"))
-
-            audioSource = factory?.createAudioSource(audioConstraints)
-            localAudioTrack = factory?.createAudioTrack("ARDAMSa0", audioSource)
-            localAudioTrack?.setEnabled(true)
-
-            Log.d(TAG, "WebRTC Audio Pipeline started.")
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to start WebRTC Pipeline: ${e.message}", e)
         }
     }
 
@@ -189,17 +157,9 @@ class AudioProcessingPipeline(private val context: Context) {
 
     fun stop() {
         job?.cancel()
-        localAudioTrack?.dispose()
-        localAudioTrack = null
-        audioSource?.dispose()
-        audioSource = null
-        factory?.dispose()
-        factory = null
-        audioDeviceModule?.release()
-        audioDeviceModule = null
         audioClassifier?.close()
         audioClassifier = null
+        webRtcManager.onAudioSamplesReady = null
         Log.d(TAG, "AudioProcessingPipeline stopped.")
     }
 }
-
