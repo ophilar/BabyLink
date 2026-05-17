@@ -46,7 +46,7 @@ android {
 }
 
 dependencies {
-    implementation(libs.ui.design)
+    implementation(project(":mock-ui-design"))
     
     // Core & Compose Bundle
     implementation(libs.androidx.core.ktx)
