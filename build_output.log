@@ -1,0 +1,5 @@
+FluxZenShared directory not found. Local composite build disabled. Set 'fluxzen.dir' in local.properties.
+> Task :app:kspDebugKotlin UP-TO-DATE
+
+BUILD SUCCESSFUL in 2s
+1 actionable task: 1 up-to-date
