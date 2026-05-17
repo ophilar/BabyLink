@@ -19,6 +19,7 @@ class WebRtcManager @Inject constructor(
 
     var signalingClient: SignalingClient? = null
 
+    private var isInitialized = false
     private var factory: PeerConnectionFactory? = null
     var peerConnection: PeerConnection? = null
     var localVideoTrack: VideoTrack? = null
@@ -34,33 +35,40 @@ class WebRtcManager @Inject constructor(
     var onAudioSamplesReady: ((JavaAudioDeviceModule.AudioSamples) -> Unit)? = null
 
     init {
-        initWebRTC()
+        // initWebRTC() removed from init block to prevent startup crash
     }
 
-    private fun initWebRTC() {
-        PeerConnectionFactory.initialize(
-            PeerConnectionFactory.InitializationOptions.builder(context)
-                .setEnableInternalTracer(true)
-                .createInitializationOptions()
-        )
-        val options = PeerConnectionFactory.Options()
-        val defaultVideoEncoderFactory = DefaultVideoEncoderFactory(eglBase.eglBaseContext, true, true)
-        val defaultVideoDecoderFactory = DefaultVideoDecoderFactory(eglBase.eglBaseContext)
+    fun initWebRTCIfNotInitialized() {
+        if (isInitialized) return
+        try {
+            PeerConnectionFactory.initialize(
+                PeerConnectionFactory.InitializationOptions.builder(context)
+                    .setEnableInternalTracer(true)
+                    .createInitializationOptions()
+            )
+            val options = PeerConnectionFactory.Options()
+            val defaultVideoEncoderFactory = DefaultVideoEncoderFactory(eglBase.eglBaseContext, true, true)
+            val defaultVideoDecoderFactory = DefaultVideoDecoderFactory(eglBase.eglBaseContext)
 
-        val audioDeviceModule = JavaAudioDeviceModule.builder(context)
-            .setUseHardwareAcousticEchoCanceler(true)
-            .setUseHardwareNoiseSuppressor(true)
-            .setSamplesReadyCallback { audioSamples ->
-                onAudioSamplesReady?.invoke(audioSamples)
-            }
-            .createAudioDeviceModule()
+            val audioDeviceModule = JavaAudioDeviceModule.builder(context)
+                .setUseHardwareAcousticEchoCanceler(true)
+                .setUseHardwareNoiseSuppressor(true)
+                .setSamplesReadyCallback { audioSamples ->
+                    onAudioSamplesReady?.invoke(audioSamples)
+                }
+                .createAudioDeviceModule()
 
-        factory = PeerConnectionFactory.builder()
-            .setOptions(options)
-            .setVideoEncoderFactory(defaultVideoEncoderFactory)
-            .setVideoDecoderFactory(defaultVideoDecoderFactory)
-            .setAudioDeviceModule(audioDeviceModule)
-            .createPeerConnectionFactory()
+            factory = PeerConnectionFactory.builder()
+                .setOptions(options)
+                .setVideoEncoderFactory(defaultVideoEncoderFactory)
+                .setVideoDecoderFactory(defaultVideoDecoderFactory)
+                .setAudioDeviceModule(audioDeviceModule)
+                .createPeerConnectionFactory()
+
+            isInitialized = true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to initialize WebRTC: ${e.message}")
+        }
     }
 
     fun getEglBaseContext(): EglBase.Context = eglBase.eglBaseContext
@@ -168,8 +176,9 @@ class WebRtcManager @Inject constructor(
         surfaceTextureHelper?.dispose()
         peerConnection?.close()
         factory?.dispose()
-        eglBase.release()
+        // Removed eglBase release as it might be used by a renderer that is still alive
         _remoteVideoTrackFlow.value = null
+        isInitialized = false
     }
 
     // PeerConnection.Observer methods

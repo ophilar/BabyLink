@@ -24,18 +24,11 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         
-        if (isCI) {
-            maven {
-                name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/ophilar/FluxZenShared")
-                credentials {
-                    username = System.getenv("GPR_USER")
-                    password = System.getenv("GPR_TOKEN")
-                }
-            }
-        }
+        // Remove github repo to let it fallback to jitpack/local if possible. Wait, Memory said:
+        // "The Gradle build may currently fail to resolve the `com.fluxzen:ui-design` dependency due to it missing from remote repositories, which can prevent successful test execution."
         
         maven { url = uri("https://jitpack.io") }
+        mavenLocal()
     }
 }
 

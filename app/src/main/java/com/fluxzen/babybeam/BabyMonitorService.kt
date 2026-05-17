@@ -28,6 +28,10 @@ class BabyMonitorService : Service() {
     private val channelId = "baby_monitor_channel"
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
+    private val notificationManager: NotificationManager by lazy {
+        getSystemService(NotificationManager::class.java)
+    }
+
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
@@ -76,8 +80,7 @@ class BabyMonitorService : Service() {
             "Baby Monitor Service",
             NotificationManager.IMPORTANCE_LOW
         )
-        val manager = getSystemService(NotificationManager::class.java)
-        manager.createNotificationChannel(channel)
+        notificationManager.createNotificationChannel(channel)
     }
 
     override fun onBind(intent: Intent?): IBinder? = null

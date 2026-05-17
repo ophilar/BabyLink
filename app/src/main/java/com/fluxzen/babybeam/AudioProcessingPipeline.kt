@@ -20,6 +20,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.log10
 import kotlin.math.sqrt
+import java.io.File
 
 @Singleton
 class AudioProcessingPipeline @Inject constructor(
@@ -54,8 +55,21 @@ class AudioProcessingPipeline @Inject constructor(
 
     private fun initMediaPipe(onCryDetected: () -> Unit) {
         try {
+            // Check if model file exists before initializing
+            val modelPath = "cry_detection_model.tflite"
+            var hasModel = false
+            try {
+                context.assets.open(modelPath).use {
+                    hasModel = true
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Model file $modelPath not found in assets. MediaPipe will not be initialized.")
+            }
+
+            if (!hasModel) return
+
             val baseOptionsBuilder = BaseOptions.builder()
-                .setModelAssetPath("cry_detection_model.tflite")
+                .setModelAssetPath(modelPath)
                 .setDelegate(Delegate.CPU)
 
             val optionsBuilder = AudioClassifier.AudioClassifierOptions.builder()
@@ -76,6 +90,8 @@ class AudioProcessingPipeline @Inject constructor(
     }
 
     private fun processAudioSamples(audioSamples: JavaAudioDeviceModule.AudioSamples) {
+        if (audioClassifier == null) return
+
         val buffer = audioSamples.data
         val length = buffer.size
         

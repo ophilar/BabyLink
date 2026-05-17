@@ -60,6 +60,19 @@ class BabyMonitorViewModel @Inject constructor(
     private val _isLullabyPlaying = MutableStateFlow(false)
     val isLullabyPlaying = _isLullabyPlaying.asStateFlow()
 
+    private val vibrator: Vibrator? by lazy {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? android.os.VibratorManager
+                vibratorManager?.defaultVibrator ?: context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+            } else {
+                context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
 
     init {
         webRtcManager.signalingClient = this
@@ -167,17 +180,12 @@ class BabyMonitorViewModel @Inject constructor(
         }
         
         if (_vibrationEnabled.value) {
-            val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? android.os.VibratorManager
-                vibratorManager?.defaultVibrator ?: context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-            } else {
-                context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-            }
-            vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE))
+             vibrator?.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE))
         }
     }
 
     fun startMonitoring(activityContext: Context) {
+        webRtcManager.initWebRTCIfNotInitialized()
         _isSender = true
         webRtcManager.startLocalVideoAndAudio()
 
@@ -196,6 +204,7 @@ class BabyMonitorViewModel @Inject constructor(
     }
 
     fun startDiscovery() {
+        webRtcManager.initWebRTCIfNotInitialized()
         _isSender = false
         nearbyTransport.startDiscovery()
     }
