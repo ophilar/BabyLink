@@ -1,13 +1,13 @@
 package com.fluxzen.babybeam
 
 import android.content.Context
-import android.util.Base64
 import java.security.KeyFactory
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.Signature
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
+import java.util.Base64
 
 object SecurityUtil {
     private const val PREFS_NAME = "BabyBeamSecurityPrefs"
@@ -41,8 +41,8 @@ object SecurityUtil {
 
         if (privStr != null && pubStr != null) {
             try {
-                val privKeyBytes = Base64.decode(privStr, Base64.NO_WRAP)
-                val pubKeyBytes = Base64.decode(pubStr, Base64.NO_WRAP)
+                val privKeyBytes = Base64.getDecoder().decode(privStr)
+                val pubKeyBytes = Base64.getDecoder().decode(pubStr)
                 val kf = KeyFactory.getInstance(KEY_ALGORITHM)
                 val privateKey = kf.generatePrivate(PKCS8EncodedKeySpec(privKeyBytes))
                 val publicKey = kf.generatePublic(X509EncodedKeySpec(pubKeyBytes))
@@ -57,8 +57,8 @@ object SecurityUtil {
         kpg.initialize(2048)
         val kp = kpg.generateKeyPair()
         prefs.edit()
-            .putString(PREF_PRIVATE_KEY, Base64.encodeToString(kp.private.encoded, Base64.NO_WRAP))
-            .putString(PREF_PUBLIC_KEY, Base64.encodeToString(kp.public.encoded, Base64.NO_WRAP))
+            .putString(PREF_PRIVATE_KEY, Base64.getEncoder().encodeToString(kp.private.encoded))
+            .putString(PREF_PUBLIC_KEY, Base64.getEncoder().encodeToString(kp.public.encoded))
             .apply()
         myKeyPair = kp
         return kp
@@ -68,7 +68,7 @@ object SecurityUtil {
     fun generateSignedMessage(context: Context?, payload: String): String {
         val keyPair = getOrCreateKeyPair(context)
         val timestamp = System.currentTimeMillis()
-        val pubKeyBase64 = if (context != null) Base64.encodeToString(keyPair.public.encoded, Base64.NO_WRAP) else java.util.Base64.getEncoder().encodeToString(keyPair.public.encoded)
+        val pubKeyBase64 = Base64.getEncoder().encodeToString(keyPair.public.encoded)
 
         val messageToSign = "$pubKeyBase64:$payload:$timestamp"
 
@@ -76,7 +76,7 @@ object SecurityUtil {
         signature.initSign(keyPair.private)
         signature.update(messageToSign.toByteArray(Charsets.UTF_8))
         val sigBytes = signature.sign()
-        val sigBase64 = if (context != null) Base64.encodeToString(sigBytes, Base64.NO_WRAP) else java.util.Base64.getEncoder().encodeToString(sigBytes)
+        val sigBase64 = Base64.getEncoder().encodeToString(sigBytes)
 
         return "$messageToSign:$sigBase64"
     }
@@ -112,7 +112,7 @@ object SecurityUtil {
         }
 
         try {
-            val pubKeyBytes = if (context != null) Base64.decode(pubKeyBase64, Base64.NO_WRAP) else java.util.Base64.getDecoder().decode(pubKeyBase64)
+            val pubKeyBytes = Base64.getDecoder().decode(pubKeyBase64)
             val kf = KeyFactory.getInstance(KEY_ALGORITHM)
             val publicKey = kf.generatePublic(X509EncodedKeySpec(pubKeyBytes))
 
@@ -122,7 +122,7 @@ object SecurityUtil {
             signature.initVerify(publicKey)
             signature.update(messageToVerify.toByteArray(Charsets.UTF_8))
 
-            val sigBytes = if (context != null) Base64.decode(sigBase64, Base64.NO_WRAP) else java.util.Base64.getDecoder().decode(sigBase64)
+            val sigBytes = Base64.getDecoder().decode(sigBase64)
             if (signature.verify(sigBytes)) {
                 return payload
             }

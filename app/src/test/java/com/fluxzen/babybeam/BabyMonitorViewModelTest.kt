@@ -1,7 +1,8 @@
 package com.fluxzen.babybeam
 
 import android.content.Context
-import com.fluxzen.ui_design.sync.NearbyTransportLayer
+import com.fluxzen.ui_design.sync.*
+import com.google.android.gms.nearby.connection.Payload
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -14,24 +15,31 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BabyMonitorViewModelTest {
 
     private lateinit var viewModel: BabyMonitorViewModel
     private val events = MutableSharedFlow<NearbyTransportLayer.TransportEvent>()
-    private val transportLayer = mock<NearbyTransportLayer> {
-        on { events } doReturn events
-    }
-    private val context = mock<android.content.Context> {
-        on { getSystemService(any()) } doReturn null
-    }
+    private val transportLayer = mock<NearbyTransportLayer>()
+    private val webRtcManager = mock<WebRtcManager>()
+    private val sharedPrefs = mock<android.content.SharedPreferences>()
+    private val editor = mock<android.content.SharedPreferences.Editor>()
+    private val context = mock<android.content.Context>()
     private val testDispatcher = UnconfinedTestDispatcher()
 
     @BeforeEach
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = BabyMonitorViewModel(context, transportLayer)
+        
+        whenever(transportLayer.events).thenReturn(events)
+        whenever(context.getSharedPreferences(any(), any())).thenReturn(sharedPrefs)
+        whenever(sharedPrefs.getString(any(), any())).thenReturn(null)
+        whenever(sharedPrefs.edit()).thenReturn(editor)
+        whenever(editor.putString(any(), any())).thenReturn(editor)
+        
+        viewModel = BabyMonitorViewModel(context, transportLayer, webRtcManager)
     }
 
     @AfterEach
@@ -64,10 +72,14 @@ class BabyMonitorViewModelTest {
         viewModel.setVibration(false)
 
         // Emit data received event
-        val payloadMock = mock<NearbyTransportLayer.Payload> {
-            on { asBytes() } doReturn "cry_detected".toByteArray()
+        val signedMessage = SecurityUtil.generateSignedMessage(null, "cry_detected")
+        val payload = mock<Payload> {
+            on { asBytes() } doReturn signedMessage.toByteArray()
         }
-        events.emit(NearbyTransportLayer.TransportEvent.DataReceived("endpointId", payloadMock))
+        val event = NearbyTransportLayer.TransportEvent.DataReceived("endpointId", payload)
+        
+        events.emit(event)
+        runCurrent()
 
         // Wait for coroutine and check alert
         assertTrue(viewModel.isCryDetected.value)
