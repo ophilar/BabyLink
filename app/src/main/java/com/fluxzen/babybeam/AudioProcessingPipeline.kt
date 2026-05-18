@@ -11,6 +11,7 @@ import com.google.mediapipe.tasks.components.containers.AudioData
 import com.google.mediapipe.tasks.components.containers.Category
 import com.google.mediapipe.tasks.core.BaseOptions
 import com.google.mediapipe.tasks.core.Delegate
+import com.fluxzen.ui_design.sync.WebRtcManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import org.webrtc.audio.JavaAudioDeviceModule
@@ -24,7 +25,7 @@ import java.io.File
 
 @Singleton
 class AudioProcessingPipeline @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val webRtcManager: WebRtcManager
 ) {
     private val TAG = "AudioProcessingPipeline"
@@ -47,7 +48,7 @@ class AudioProcessingPipeline @Inject constructor(
 
         job = coroutineScope.launch(Dispatchers.IO) {
             initMediaPipe(onCryDetected)
-            webRtcManager.onAudioSamplesReady = { audioSamples ->
+            webRtcManager.onAudioSamplesReady = { audioSamples: org.webrtc.audio.JavaAudioDeviceModule.AudioSamples ->
                 processAudioSamples(audioSamples)
             }
         }

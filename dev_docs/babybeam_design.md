@@ -17,4 +17,11 @@
 
 ## Security & Privacy
 - **Zero Cloud**: No audio data leaves the local Wi-Fi/Bluetooth mesh.
+- **Identity (TOFU)**: Uses Trust On First Use (TOFU) with RSA-2048 keys.
+- **Key Management**: Private keys are stored in the hardware-backed **Android Keystore** to prevent extraction.
+- **Signaling Integrity**: All signaling messages (SDP, ICE, Controls) are wrapped in a signed container to prevent MitM hijacking.
 - **Local Logs**: Alerts are stored purely in memory or encrypted local storage (Tink).
+
+## Performance & Compatibility
+- **16KB Page Alignment**: All native libraries (WebRTC, LiteRT) must be 16KB aligned to support Android 15+ and future-proof the application.
+- **Local Inference**: Audio processing is performed on-device using LiteRT to maintain latency and privacy.

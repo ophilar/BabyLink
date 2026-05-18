@@ -3,10 +3,9 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.gms)
+    alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
 }
-
 
 android {
     namespace = "com.fluxzen.babybeam"
@@ -32,12 +31,24 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+    
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
     }
+    
     buildFeatures {
         compose = true
     }
+    
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
     testOptions {
         unitTests.all {
             it.useJUnitPlatform()
@@ -46,13 +57,12 @@ android {
 }
 
 dependencies {
-    implementation(project(":mock-ui-design"))
+    implementation(libs.ui.design)
     
     // Core & Compose Bundle
     implementation(libs.androidx.core.ktx)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose)
-    implementation(libs.androidx.material.icons.extended)
     implementation(libs.material)
     
     // Firebase
@@ -65,22 +75,23 @@ dependencies {
     
     // AI & Streaming
     implementation(libs.mediapipe.tasks.audio)
+    implementation(libs.litert) // Enforce 16KB alignment
     implementation(libs.webrtc.android)
     
-    // Navigation 3 & Adaptive UI
-    implementation(libs.androidx.navigation3.runtime)
-    implementation(libs.androidx.navigation3.ui)
-    implementation(libs.androidx.material3.windowsize)
+    // WorkManager (Fixes PendingIntent S+ crash)
+    implementation(libs.androidx.work.runtime.ktx)
+    
+    // Navigation 3
+    implementation(libs.bundles.navigation3)
     
     // DI (Hilt Bundle)
     implementation(libs.bundles.hilt)
     ksp(libs.hilt.android.compiler)
     
-    // Testing (Bundles & Junit5 Runtime)
+    // Testing
     testImplementation(libs.bundles.test.unit)
     testRuntimeOnly(libs.junit.jupiter.engine)
     testRuntimeOnly(libs.junit.platform.launcher)
     androidTestImplementation(libs.bundles.test.android)
     coreLibraryDesugaring(libs.android.desugar.jdk)
 }
-

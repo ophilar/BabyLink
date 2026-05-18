@@ -26,6 +26,7 @@
 
 ## Phase 4: Production Alignment
 - [x] **Zero-Maintenance Pattern** - Local/Remote source alignment for `FluxZenShared`.
-- [ ] **16KB Alignment migration** (LiteRT).
+- [ ] **16KB Alignment migration** (LiteRT 2.0.2+, WebRTC M121+).
+- [ ] **Security Hardening** - Migrate to Android Keystore & Sign all signaling messages.
 - [ ] Release ProGuard/R8 hardening.
 - [ ] Google Play deployment metadata.

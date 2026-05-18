@@ -62,4 +62,3 @@ if (!isCI) {
         logger.warn("FluxZenShared directory not found. Local composite build disabled. Set 'fluxzen.dir' in local.properties.")
     }
 }
-include(":mock-ui-design")

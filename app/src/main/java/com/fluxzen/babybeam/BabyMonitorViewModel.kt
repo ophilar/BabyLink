@@ -9,6 +9,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fluxzen.ui_design.sync.NearbyTransportLayer
+import com.fluxzen.ui_design.sync.WebRtcManager
+import com.fluxzen.ui_design.sync.SignalingMessage
+import com.fluxzen.ui_design.sync.SignalingClient
+import com.fluxzen.ui_design.security.SecurityUtil
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -25,7 +29,8 @@ import javax.inject.Inject
 class BabyMonitorViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val nearbyTransport: NearbyTransportLayer,
-    val webRtcManager: WebRtcManager
+    val webRtcManager: WebRtcManager,
+    private val securityUtil: SecurityUtil
 ) : ViewModel(), SignalingClient {
 
     private val TAG = "BabyMonitorViewModel"
@@ -64,8 +69,9 @@ class BabyMonitorViewModel @Inject constructor(
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? android.os.VibratorManager
-                vibratorManager?.defaultVibrator ?: context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+                vibratorManager?.defaultVibrator
             } else {
+                @Suppress("DEPRECATION")
                 context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
             }
         } catch (e: Exception) {
@@ -86,21 +92,19 @@ class BabyMonitorViewModel @Inject constructor(
                     is NearbyTransportLayer.TransportEvent.DataReceived -> {
                         val messageStr = String(event.payload.asBytes() ?: byteArrayOf())
 
-                        try {
-                            // Try parsing as SignalingMessage
-                            val msg = gson.fromJson(messageStr, SignalingMessage::class.java)
-                            if (msg != null && msg.type != null) {
-                                handleSignalingMessage(msg)
-                                return@collectLatest
+                        val verifiedPayload = securityUtil.verifySignedMessage(context, messageStr)
+                        
+                        if (verifiedPayload != null) {
+                            try {
+                                val msg = gson.fromJson(verifiedPayload, SignalingMessage::class.java)
+                                if (msg?.type != null) {
+                                    handleSignalingMessage(msg)
+                                }
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Failed to parse verified payload as JSON: $e")
                             }
-                        } catch (e: Exception) {
-                            // Not JSON, fallback to old logic
-                        }
-
-                        // Legacy logic
-                        val payload = SecurityUtil.verifySignedMessage(context, messageStr)
-                        if (payload == "cry_detected") {
-                            triggerAlert()
+                        } else {
+                            Log.w(TAG, "Received message failed security verification or was from untrusted peer.")
                         }
                     }
                     is NearbyTransportLayer.TransportEvent.AdvertisingStarted -> _connectionStatus.value = "Advertising..."
@@ -109,7 +113,7 @@ class BabyMonitorViewModel @Inject constructor(
                         if (event.statusCode == 0) {
                             _connectionStatus.value = "Connected"
                             if (!_isSender) {
-                                // Receiver connects to Sender. Receiver should start PC so it's ready.
+                                webRtcManager.initWebRTC()
                                 webRtcManager.startPeerConnection()
                             }
                         } else {
@@ -135,13 +139,17 @@ class BabyMonitorViewModel @Inject constructor(
                 }
             }
             "candidate" -> {
-                if (msg.sdp != null && msg.sdpMid != null && msg.sdpMLineIndex != null) {
-                    webRtcManager.handleIceCandidate(IceCandidate(msg.sdpMid, msg.sdpMLineIndex, msg.sdp))
+                val sdp = msg.sdp
+                val mid = msg.sdpMid
+                val index = msg.sdpMLineIndex
+                if (sdp != null && mid != null && index != null) {
+                    webRtcManager.handleIceCandidate(IceCandidate(mid, index, sdp))
                 }
             }
             "toggle_light" -> msg.isOn?.let { _isNightLightOn.value = it }
             "toggle_mic" -> msg.isOn?.let { _isMicActive.value = it }
             "toggle_lullaby" -> msg.isOn?.let { _isLullabyPlaying.value = it }
+            "cry_detected" -> triggerAlert()
         }
     }
 
@@ -167,7 +175,8 @@ class BabyMonitorViewModel @Inject constructor(
 
     private fun sendViaNearby(msg: SignalingMessage) {
         val json = gson.toJson(msg)
-        nearbyTransport.broadcastMessage(json)
+        val signedPayload = securityUtil.generateSignedMessage(context, json)
+        nearbyTransport.broadcastMessage(signedPayload)
     }
 
     private fun triggerAlert() {
@@ -185,7 +194,7 @@ class BabyMonitorViewModel @Inject constructor(
     }
 
     fun startMonitoring(activityContext: Context) {
-        webRtcManager.initWebRTCIfNotInitialized()
+        webRtcManager.initWebRTC()
         _isSender = true
         webRtcManager.startLocalVideoAndAudio()
 
@@ -196,15 +205,10 @@ class BabyMonitorViewModel @Inject constructor(
             activityContext.startService(intent)
         }
         nearbyTransport.startAdvertising("BabyDevice_${System.currentTimeMillis()}")
-
-        viewModelScope.launch {
-            delay(2000)
-            _pendingConnections.value = _pendingConnections.value + "Parent's Phone"
-        }
     }
 
     fun startDiscovery() {
-        webRtcManager.initWebRTCIfNotInitialized()
+        webRtcManager.initWebRTC()
         _isSender = false
         nearbyTransport.startDiscovery()
     }
@@ -232,7 +236,6 @@ class BabyMonitorViewModel @Inject constructor(
         _connectedDevices.value = _connectedDevices.value + deviceName
 
         if (_isSender) {
-            // Once connected, Sender creates offer to start WebRTC
             webRtcManager.startPeerConnection()
             webRtcManager.createOffer()
         }

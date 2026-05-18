@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.fluxzen.babybeam.BabyMonitorViewModel
+import com.fluxzen.ui_design.sync.WebRtcManager
 import com.fluxzen.ui_design.display.LocalThemeStrategy
 import com.fluxzen.ui_design.display.rememberThemeAnimations
 import org.webrtc.RendererCommon
@@ -42,15 +43,15 @@ fun ListeningScreen(
     val strategy = LocalThemeStrategy.current
     val animations = rememberThemeAnimations()
     
-    // Mock data
-    val roomTemp = 21
-    val roomHumidity = 45
+    // Mock data removed
+    val roomTemp = "--"
+    val roomHumidity = "--"
 
     val isCryDetected by viewModel.isCryDetected.collectAsState()
     val vibrationEnabled by viewModel.vibrationEnabled.collectAsState()
     val visualAlertEnabled by viewModel.visualAlertEnabled.collectAsState()
     val connectionStatus by viewModel.connectionStatus.collectAsState()
-    val remoteVideoTrack by viewModel.webRtcManager?.remoteVideoTrackFlow?.collectAsState(initial = null) ?: remember { mutableStateOf(null) }
+    val remoteVideoTrack by viewModel.webRtcManager.remoteVideoTrackFlow.collectAsState(initial = null)
 
     val isLightOn by viewModel.isNightLightOn.collectAsState()
     val isMicActive by viewModel.isMicActive.collectAsState()
@@ -118,7 +119,7 @@ fun ListeningScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     if (remoteVideoTrack != null) {
-                        VideoRenderer(videoTrack = remoteVideoTrack!!, eglBaseContext = viewModel.webRtcManager!!.getEglBaseContext())
+                        VideoRenderer(videoTrack = remoteVideoTrack!!, eglBaseContext = viewModel.webRtcManager.getEglBaseContext())
                     } else {
                         Text("WAITING FOR VIDEO", color = Color.White.copy(alpha = 0.5f))
                     }

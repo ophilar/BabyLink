@@ -2,7 +2,9 @@ package com.fluxzen.babybeam
 
 import android.content.Context
 import com.fluxzen.ui_design.sync.*
+import com.fluxzen.ui_design.security.SecurityUtil
 import com.google.android.gms.nearby.connection.Payload
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -12,10 +14,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BabyMonitorViewModelTest {
@@ -24,22 +23,16 @@ class BabyMonitorViewModelTest {
     private val events = MutableSharedFlow<NearbyTransportLayer.TransportEvent>()
     private val transportLayer = mock<NearbyTransportLayer>()
     private val webRtcManager = mock<WebRtcManager>()
-    private val sharedPrefs = mock<android.content.SharedPreferences>()
-    private val editor = mock<android.content.SharedPreferences.Editor>()
+    private val securityUtil = mock<SecurityUtil>()
     private val context = mock<android.content.Context>()
     private val testDispatcher = UnconfinedTestDispatcher()
+    private val gson = Gson()
 
     @BeforeEach
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        
         whenever(transportLayer.events).thenReturn(events)
-        whenever(context.getSharedPreferences(any(), any())).thenReturn(sharedPrefs)
-        whenever(sharedPrefs.getString(any(), any())).thenReturn(null)
-        whenever(sharedPrefs.edit()).thenReturn(editor)
-        whenever(editor.putString(any(), any())).thenReturn(editor)
-        
-        viewModel = BabyMonitorViewModel(context, transportLayer, webRtcManager)
+        viewModel = BabyMonitorViewModel(context, transportLayer, webRtcManager, securityUtil)
     }
 
     @AfterEach
@@ -68,11 +61,14 @@ class BabyMonitorViewModelTest {
 
     @Test
     fun `triggerAlert resets alert after delay`() = runTest {
-        // Disable vibration to avoid Android framework VibrationEffect.createOneShot exception in local unit test
         viewModel.setVibration(false)
 
-        // Emit data received event
-        val signedMessage = SecurityUtil.generateSignedMessage(null, "cry_detected")
+        val cryMsg = SignalingMessage(type = "cry_detected")
+        val json = gson.toJson(cryMsg)
+        val signedMessage = "dummy_signed_json"
+        
+        whenever(securityUtil.verifySignedMessage(eq(context), eq(signedMessage))).thenReturn(json)
+
         val payload = mock<Payload> {
             on { asBytes() } doReturn signedMessage.toByteArray()
         }
@@ -81,13 +77,11 @@ class BabyMonitorViewModelTest {
         events.emit(event)
         runCurrent()
 
-        // Wait for coroutine and check alert
         assertTrue(viewModel.isCryDetected.value)
 
         advanceTimeBy(10001)
         runCurrent()
 
-        // Check if alert was reset
         assertFalse(viewModel.isCryDetected.value)
     }
 }
