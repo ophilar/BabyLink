@@ -20,6 +20,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
 import org.webrtc.IceCandidate
 import org.webrtc.SessionDescription
@@ -92,19 +94,23 @@ class BabyMonitorViewModel @Inject constructor(
                     is NearbyTransportLayer.TransportEvent.DataReceived -> {
                         val messageStr = String(event.payload.asBytes() ?: byteArrayOf())
 
-                        val verifiedPayload = securityUtil.verifySignedMessage(context, messageStr)
-                        
-                        if (verifiedPayload != null) {
-                            try {
-                                val msg = gson.fromJson(verifiedPayload, SignalingMessage::class.java)
-                                if (msg?.type != null) {
-                                    handleSignalingMessage(msg)
+                        val msg = withContext(Dispatchers.Default) {
+                            val verifiedPayload = securityUtil.verifySignedMessage(context, messageStr)
+                            if (verifiedPayload != null) {
+                                try {
+                                    gson.fromJson(verifiedPayload, SignalingMessage::class.java)
+                                } catch (e: Exception) {
+                                    Log.e(TAG, "Failed to parse verified payload as JSON: $e")
+                                    null
                                 }
-                            } catch (e: Exception) {
-                                Log.e(TAG, "Failed to parse verified payload as JSON: $e")
+                            } else {
+                                Log.w(TAG, "Received message failed security verification or was from untrusted peer.")
+                                null
                             }
-                        } else {
-                            Log.w(TAG, "Received message failed security verification or was from untrusted peer.")
+                        }
+
+                        if (msg?.type != null) {
+                            handleSignalingMessage(msg)
                         }
                     }
                     is NearbyTransportLayer.TransportEvent.AdvertisingStarted -> _connectionStatus.value = "Advertising..."
