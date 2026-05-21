@@ -14,4 +14,5 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("javax.inject:javax.inject:1")
     implementation("com.google.android.gms:play-services-nearby:19.3.0")
+    implementation("io.github.webrtc-sdk:android:144.7559.05")
 }
