@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
+import androidx.core.content.ContextCompat
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -67,13 +68,7 @@ class BabyMonitorViewModel @Inject constructor(
 
     private val vibrator: Vibrator? by lazy {
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? android.os.VibratorManager
-                vibratorManager?.defaultVibrator
-            } else {
-                @Suppress("DEPRECATION")
-                context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
-            }
+            ContextCompat.getSystemService(context, Vibrator::class.java)
         } catch (e: Exception) {
             null
         }
