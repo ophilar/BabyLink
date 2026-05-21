@@ -23,7 +23,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        
+
         if (isCI) {
             maven {
                 name = "GitHubPackages"
@@ -34,14 +34,13 @@ dependencyResolutionManagement {
                 }
             }
         }
-        
+
         maven { url = uri("https://jitpack.io") }
     }
 }
 
 rootProject.name = "BabyBeam"
 include(":app")
-include(":mock-ui-design")
 
 if (!isCI) {
     val localProperties = java.util.Properties().apply {
@@ -51,7 +50,7 @@ if (!isCI) {
         }
     }
     val fluxZenDir = localProperties.getProperty("fluxzen.dir")?.let { file(it) }
-    
+
     if (fluxZenDir != null && fluxZenDir.exists()) {
         includeBuild(fluxZenDir) {
             dependencySubstitution {
@@ -61,11 +60,5 @@ if (!isCI) {
         }
     } else {
         logger.warn("FluxZenShared directory not found. Local composite build disabled. Set 'fluxzen.dir' in local.properties.")
-    }
-} else {
-    includeBuild(".") {
-        dependencySubstitution {
-            substitute(module("com.fluxzen:ui-design")).using(project(":mock-ui-design"))
-        }
     }
 }
