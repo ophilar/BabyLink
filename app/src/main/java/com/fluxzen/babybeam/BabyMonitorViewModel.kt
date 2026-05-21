@@ -20,6 +20,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.webrtc.IceCandidate
 import org.webrtc.SessionDescription
@@ -174,9 +175,11 @@ class BabyMonitorViewModel @Inject constructor(
     }
 
     private fun sendViaNearby(msg: SignalingMessage) {
-        val json = gson.toJson(msg)
-        val signedPayload = securityUtil.generateSignedMessage(context, json)
-        nearbyTransport.broadcastMessage(signedPayload)
+        viewModelScope.launch(Dispatchers.Default) {
+            val json = gson.toJson(msg)
+            val signedPayload = securityUtil.generateSignedMessage(context, json)
+            nearbyTransport.broadcastMessage(signedPayload)
+        }
     }
 
     private fun triggerAlert() {

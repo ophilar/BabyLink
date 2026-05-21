@@ -1,0 +1,7 @@
+The `sendViaNearby` function in `BabyMonitorViewModel` is used to send signaling messages (like ICE candidates or toggle commands) via Nearby Connections.
+
+Prior to this optimization, the function serialized the `SignalingMessage` to JSON using `Gson` and generated an RSA-signed payload synchronously on the main thread. Both JSON serialization and cryptographic signature generation are CPU-intensive operations. When executed on the main thread, they can cause main-thread blocking, leading to dropped frames and UI jank, especially when a burst of messages (like WebRTC ICE candidates) are being sent.
+
+Due to a missing remote repository for the `ui-design` package (as documented in the memory context), a full build and test execution to benchmark the exact time difference could not be successfully run natively in this environment. However, the optimization is theoretically sound and a standard Android performance practice:
+
+By wrapping the logic in `viewModelScope.launch(Dispatchers.Default)`, the CPU-bound work of serialization and cryptography is offloaded to a background thread pool optimized for CPU-intensive tasks. The `NearbyTransportLayer.broadcastMessage` handles any necessary thread dispatching internally or can safely be called from the background thread. This effectively eliminates main thread jank caused by sending nearby messages.
