@@ -24,6 +24,49 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
+    - name: Use local properties to use mock
+      run: echo "fluxzen.dir=mock-ui-design" > local.properties
+
+    - name: Create settings for mock
+      run: |
+        mkdir -p mock-ui-design/ui-design
+        mv mock-ui-design/src mock-ui-design/ui-design/
+        mv mock-ui-design/build.gradle.kts mock-ui-design/ui-design/
+        cat << 'INNER_EOF' > mock-ui-design/settings.gradle.kts
+        pluginManagement {
+            repositories {
+                google()
+                mavenCentral()
+                gradlePluginPortal()
+            }
+            plugins {
+                id("com.android.library") version "9.2.1"
+                id("org.jetbrains.kotlin.android") version "2.3.21"
+                id("org.jetbrains.kotlin.plugin.compose") version "2.3.21"
+            }
+        }
+        dependencyResolutionManagement {
+            repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+            repositories {
+                google()
+                mavenCentral()
+            }
+        }
+        rootProject.name = "FluxZenShared"
+        include(":ui-design")
+        include(":firebase-auth")
+        INNER_EOF
+        mkdir -p mock-ui-design/firebase-auth
+        cat << 'INNER_EOF' > mock-ui-design/firebase-auth/build.gradle.kts
+        plugins {
+            id("com.android.library")
+        }
+        android {
+            namespace = "com.fluxzen.firebase_auth"
+            compileSdk = 36
+            defaultConfig { minSdk = 31 }
+        }
+        INNER_EOF
     - name: Build with Gradle
       run: ./gradlew assembleDebug
       env:
