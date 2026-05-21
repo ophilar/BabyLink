@@ -1,4 +1,0 @@
-🎯 **What:** Replaced manual Android version checks and deprecated `Context.VIBRATOR_SERVICE` access with `ContextCompat.getSystemService(context, Vibrator::class.java)`.
-💡 **Why:** Reduces verbosity, removes a `@Suppress("DEPRECATION")` tag, and delegates standard version-specific logic to the proven AndroidX compatibility library, making the code cleaner and less error-prone to maintain.
-✅ **Verification:** Ensured that the logic surrounding the service instantiation is preserved. Attempted building the app and running tests; they fail due to a missing dependency `com.fluxzen:ui-design:1.0.2` in `BabyBeam` project unrelated to the changes. Reviewed via code review tool which deemed the fix correct and robust.
-✨ **Result:** Improved code cleanliness and maintainability by utilizing AndroidX conventions without changing the underlying behavior.
