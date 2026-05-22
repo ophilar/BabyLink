@@ -41,7 +41,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "BabyBeam"
 include(":app")
-include(":mock-ui-design")
 
 val localProperties = java.util.Properties().apply {
     val localFile = file("local.properties")
@@ -59,5 +58,5 @@ if (fluxZenDir != null && fluxZenDir.exists()) {
         }
     }
 } else {
-    logger.warn("FluxZenShared directory not found. Local composite build disabled. Using mock-ui-design.")
+    logger.error("FluxZenShared directory not found at $fluxZenDir. Composite build required. Set 'fluxzen.dir' in local.properties.")
 }

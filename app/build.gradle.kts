@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -56,9 +58,42 @@ android {
     }
 }
 
-dependencies {
+val localProperties = Properties().apply {
+    val localFile = rootProject.file("local.properties")
+    if (localFile.exists()) {
+        localFile.inputStream().use { load(it) }
+    }
+}
+val releaseDir = localProperties.getProperty("release.dir")
 
-    implementation(project(":mock-ui-design"))
+if (releaseDir != null) {
+    tasks.register<Copy>("publishApk") {
+        description = "Copies the generated APK to the OneDrive Releases folder."
+        group = "publishing"
+
+        doFirst {
+            println("Publishing APKs to: $releaseDir")
+        }
+
+        from(layout.buildDirectory.dir("outputs/apk"))
+
+        into(releaseDir)
+        include("**/*.apk")
+        
+        eachFile {
+            val buildType = relativePath.segments[0]
+            path = "BabyBeam-${android.defaultConfig.versionName}-$buildType.apk"
+        }
+        includeEmptyDirs = false
+    }
+
+    tasks.matching { it.name.startsWith("assemble") }.configureEach {
+        finalizedBy("publishApk")
+    }
+}
+
+dependencies {
+    implementation("com.fluxzen:ui-design")
 
     
     // Core & Compose Bundle
