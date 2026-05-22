@@ -27,7 +27,7 @@ dependencyResolutionManagement {
         if (isCI) {
             maven {
                 name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/ophilar/FluxZenShared")
+                url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPOSITORY") ?: "ophilar/BabyLink"}")
                 credentials {
                     username = System.getenv("GPR_USER")
                     password = System.getenv("GPR_TOKEN")
@@ -41,24 +41,23 @@ dependencyResolutionManagement {
 
 rootProject.name = "BabyBeam"
 include(":app")
+include(":mock-ui-design")
 
-if (!isCI) {
-    val localProperties = java.util.Properties().apply {
-        val localFile = file("local.properties")
-        if (localFile.exists()) {
-            localFile.inputStream().use { load(it) }
+val localProperties = java.util.Properties().apply {
+    val localFile = file("local.properties")
+    if (localFile.exists()) {
+        localFile.inputStream().use { load(it) }
+    }
+}
+val fluxZenDir = localProperties.getProperty("fluxzen.dir")?.let { file(it) }
+
+if (fluxZenDir != null && fluxZenDir.exists()) {
+    includeBuild(fluxZenDir) {
+        dependencySubstitution {
+            substitute(module("com.fluxzen:ui-design")).using(project(":ui-design"))
+            substitute(module("com.fluxzen:firebase-auth")).using(project(":firebase-auth"))
         }
     }
-    val fluxZenDir = localProperties.getProperty("fluxzen.dir")?.let { file(it) }
-    
-    if (fluxZenDir != null && fluxZenDir.exists()) {
-        includeBuild(fluxZenDir) {
-            dependencySubstitution {
-                substitute(module("com.fluxzen:ui-design")).using(project(":ui-design"))
-                substitute(module("com.fluxzen:firebase-auth")).using(project(":firebase-auth"))
-            }
-        }
-    } else {
-        logger.warn("FluxZenShared directory not found. Local composite build disabled. Set 'fluxzen.dir' in local.properties.")
-    }
+} else {
+    logger.warn("FluxZenShared directory not found. Local composite build disabled. Using mock-ui-design.")
 }

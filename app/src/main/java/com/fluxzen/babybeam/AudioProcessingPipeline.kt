@@ -39,6 +39,8 @@ class AudioProcessingPipeline @Inject constructor(
     private val cryDebounceTimeMs = 5000L
     private val knownCryIndices = mutableSetOf<Int>()
     private val knownNonCryIndices = mutableSetOf<Int>()
+    private var preAllocatedShortBuffer: ShortArray? = null
+    private var preAllocatedFloatBuffer: FloatArray? = null
 
     fun start(coroutineScope: CoroutineScope, onCryDetected: () -> Unit) {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -97,19 +99,29 @@ class AudioProcessingPipeline @Inject constructor(
         val length = buffer.size
         
         // 1. Convert Bytes to Shorts (16-bit PCM)
-        val shortBuffer = ShortArray(length / 2)
-        ByteBuffer.wrap(buffer).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(shortBuffer)
+        val requiredShortLength = length / 2
+        var currentShortBuffer = preAllocatedShortBuffer
+        if (currentShortBuffer == null || currentShortBuffer.size != requiredShortLength) {
+            currentShortBuffer = ShortArray(requiredShortLength)
+            preAllocatedShortBuffer = currentShortBuffer
+        }
+        ByteBuffer.wrap(buffer).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(currentShortBuffer)
 
         // 2. RMS Gating
-        val rms = calculateRMS(shortBuffer)
+        val rms = calculateRMS(currentShortBuffer)
         val db = if (rms > 0) 20 * log10(rms) else 0.0
         isCurrentlyNoisy = db > dbThreshold
 
         // 3. Convert to Floats and Feed to MediaPipe if noisy
         if (isCurrentlyNoisy) {
-            val floatBuffer = FloatArray(shortBuffer.size)
-            for (i in shortBuffer.indices) {
-                floatBuffer[i] = shortBuffer[i] / 32768.0f // Normalize to [-1.0, 1.0]
+            var currentFloatBuffer = preAllocatedFloatBuffer
+            if (currentFloatBuffer == null || currentFloatBuffer.size != currentShortBuffer.size) {
+                currentFloatBuffer = FloatArray(currentShortBuffer.size)
+                preAllocatedFloatBuffer = currentFloatBuffer
+            }
+
+            for (i in currentShortBuffer.indices) {
+                currentFloatBuffer[i] = currentShortBuffer[i] / 32768.0f // Normalize to [-1.0, 1.0]
             }
 
             val audioData = AudioData.create(
@@ -117,9 +129,9 @@ class AudioProcessingPipeline @Inject constructor(
                     .setNumOfChannels(1)
                     .setSampleRate(audioSamples.sampleRate.toFloat())
                     .build(),
-                floatBuffer.size
+                currentFloatBuffer.size
             )
-            audioData.load(floatBuffer)
+            audioData.load(currentFloatBuffer)
 
             try {
                 audioClassifier?.classifyAsync(audioData, System.currentTimeMillis())
