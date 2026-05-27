@@ -92,6 +92,18 @@ if (releaseDir != null) {
     }
 }
 
+tasks.register("unitTestClasses") {
+    description = "Compiles unit test sources."
+    group = "verification"
+    dependsOn(tasks.matching { it.name.startsWith("compile") && it.name.endsWith("UnitTestSources") })
+}
+
+tasks.register("androidTestClasses") {
+    description = "Compiles android test sources."
+    group = "verification"
+    dependsOn(tasks.matching { it.name.startsWith("compile") && it.name.endsWith("AndroidTestSources") })
+}
+
 dependencies {
     implementation("com.fluxzen:ui-design")
 
