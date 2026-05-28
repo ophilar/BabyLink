@@ -1,11 +1,9 @@
 package com.fluxzen.babybeam
 
-import android.Manifest
-import android.os.Build
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -15,6 +13,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.*
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -40,64 +39,69 @@ class MainActivity : ComponentActivity() {
         
         setContent {
             val windowSizeClass = calculateWindowSizeClass(this)
-            val snackbarHostState = remember { SnackbarHostState() }
-            
-            ThemeProvider(
-                variant = ThemeVariant.Lullaby,
-                mode = DisplayMode.DARK
-            ) {
-                ProvideSoundManager {
-                    val viewModel: BabyMonitorViewModel = viewModel()
-                    val backStack = remember { mutableStateListOf<BabyBeamNavKey>(RoleSelectionKey) }
+            BabyBeamApp(windowSizeClass = windowSizeClass, activityContext = this@MainActivity)
+        }
+    }
+}
 
-                    AdaptiveNavScaffold(
-                        items = emptyList(), // No bottom nav/rail for this simple flow yet
-                        activeItemId = null,
-                        windowSizeClass = windowSizeClass,
-                        title = "BabyBeam",
-                        snackbarHost = { SnackbarHost(snackbarHostState) }
-                    ) { paddingValues ->
-                        Surface(modifier = androidx.compose.ui.Modifier.padding(paddingValues)) {
-                            val entries = backStack.map { key ->
-                                when (key) {
-                                    RoleSelectionKey -> NavEntry(key) {
-                                        RoleSelectionScreen(
-                                            viewModel = viewModel,
-                                            onRoleSelected = { isBaby ->
-                                                if (isBaby) {
-                                                    viewModel.startMonitoring(this@MainActivity)
-                                                    backStack.navigateSingleTop(MonitoringKey)
-                                                } else {
-                                                    viewModel.startDiscovery()
-                                                    backStack.navigateSingleTop(ListeningKey)
-                                                }
-                                            }
-                                        )
+@Composable
+fun BabyBeamApp(windowSizeClass: WindowSizeClass, activityContext: Context) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    ThemeProvider(
+        variant = ThemeVariant.Lullaby,
+        mode = DisplayMode.DARK
+    ) {
+        ProvideSoundManager {
+            val viewModel: BabyMonitorViewModel = viewModel()
+            val backStack = remember { mutableStateListOf<BabyBeamNavKey>(RoleSelectionKey) }
+
+            AdaptiveNavScaffold(
+                items = emptyList(), // No bottom nav/rail for this simple flow yet
+                activeItemId = null,
+                windowSizeClass = windowSizeClass,
+                title = "BabyBeam",
+                snackbarHost = { SnackbarHost(snackbarHostState) }
+            ) { paddingValues ->
+                Surface(modifier = androidx.compose.ui.Modifier.padding(paddingValues)) {
+                    val entries = backStack.map { key ->
+                        when (key) {
+                            RoleSelectionKey -> NavEntry(key) {
+                                RoleSelectionScreen(
+                                    viewModel = viewModel,
+                                    onRoleSelected = { isBaby ->
+                                        if (isBaby) {
+                                            viewModel.startMonitoring(activityContext)
+                                            backStack.navigateSingleTop(MonitoringKey)
+                                        } else {
+                                            viewModel.startDiscovery()
+                                            backStack.navigateSingleTop(ListeningKey)
+                                        }
                                     }
-                                    MonitoringKey -> NavEntry(key) {
-                                        MonitoringScreen(
-                                            viewModel = viewModel,
-                                            onBack = { backStack.removeLastOrNull() }
-                                        )
-                                    }
-                                    ListeningKey -> NavEntry(key) {
-                                        ListeningScreen(
-                                            viewModel = viewModel,
-                                            onBack = { backStack.removeLastOrNull() }
-                                        )
-                                    }
-                                }
+                                )
                             }
-
-                            NavDisplay(
-                                entries = entries,
-                                onBack = { backStack.removeLastOrNull() },
-                                transitionSpec = {
-                                    fadeIn(animationSpec = tween(500)) togetherWith fadeOut(animationSpec = tween(500))
-                                }
-                            )
+                            MonitoringKey -> NavEntry(key) {
+                                MonitoringScreen(
+                                    viewModel = viewModel,
+                                    onBack = { backStack.removeLastOrNull() }
+                                )
+                            }
+                            ListeningKey -> NavEntry(key) {
+                                ListeningScreen(
+                                    viewModel = viewModel,
+                                    onBack = { backStack.removeLastOrNull() }
+                                )
+                            }
                         }
                     }
+
+                    NavDisplay(
+                        entries = entries,
+                        onBack = { backStack.removeLastOrNull() },
+                        transitionSpec = {
+                            fadeIn(animationSpec = tween(500)) togetherWith fadeOut(animationSpec = tween(500))
+                        }
+                    )
                 }
             }
         }
