@@ -58,5 +58,5 @@ if (fluxZenDir != null && fluxZenDir.exists()) {
         }
     }
 } else {
-    logger.error("FluxZenShared directory not found at $fluxZenDir. Composite build required. Set 'fluxzen.dir' in local.properties.")
+    logger.warn("FluxZenShared directory not found at $fluxZenDir. Composite build required. Set 'fluxzen.dir' in local.properties.")
 }
