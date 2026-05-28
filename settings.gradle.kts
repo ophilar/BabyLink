@@ -27,7 +27,7 @@ dependencyResolutionManagement {
         if (isCI) {
             maven {
                 name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPOSITORY") ?: "ophilar/FluxZenShared"}")
+                url = uri("https://maven.pkg.github.com/ophilar/FluxZenShared")
                 credentials {
                     username = System.getenv("GPR_USER")
                     password = System.getenv("GPR_TOKEN")
