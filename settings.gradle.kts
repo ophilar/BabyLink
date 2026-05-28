@@ -27,7 +27,7 @@ dependencyResolutionManagement {
         if (isCI) {
             maven {
                 name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPOSITORY") ?: "ophilar/BabyLink"}")
+                url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPOSITORY") ?: "ophilar/FluxZenShared"}")
                 credentials {
                     username = System.getenv("GPR_USER")
                     password = System.getenv("GPR_TOKEN")
@@ -57,6 +57,6 @@ if (fluxZenDir != null && fluxZenDir.exists()) {
             substitute(module("com.fluxzen:firebase-auth")).using(project(":firebase-auth"))
         }
     }
-} else {
+} else if (!isCI) {
     logger.error("FluxZenShared directory not found at $fluxZenDir. Composite build required. Set 'fluxzen.dir' in local.properties.")
 }
