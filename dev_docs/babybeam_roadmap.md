@@ -30,3 +30,11 @@
 - [ ] **Security Hardening** - Migrate to Android Keystore & Sign all signaling messages.
 - [ ] Release ProGuard/R8 hardening.
 - [ ] Google Play deployment metadata.
+
+## Progress Update - 2026-05-29
+- [x] Concluded PR Audit and Consolidation.
+- [x] Merged Composable UI navigation separation (PR 17).
+- [x] Ported high-performance, background-threaded signaling and signature handling to BabyMonitorViewModel (PR 16/20).
+- [x] Ported ContextCompat vibrator refactoring (PR 14) and RoleSelection permissions cleanup (PR 19).
+- [x] Cleaned up all mocked/faked unit tests to comply with the new test engineering standard.
+
