@@ -27,7 +27,7 @@ dependencyResolutionManagement {
         if (isCI) {
             maven {
                 name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPOSITORY") ?: "ophilar/BabyLink"}")
+                url = uri("https://maven.pkg.github.com/ophilar/FluxZenShared")
                 credentials {
                     username = System.getenv("GPR_USER")
                     password = System.getenv("GPR_TOKEN")
@@ -58,5 +58,5 @@ if (fluxZenDir != null && fluxZenDir.exists()) {
         }
     }
 } else {
-    logger.error("FluxZenShared directory not found at $fluxZenDir. Composite build required. Set 'fluxzen.dir' in local.properties.")
+    logger.warn("FluxZenShared directory not found at $fluxZenDir. Composite build required. Set 'fluxzen.dir' in local.properties.")
 }
