@@ -16,6 +16,9 @@ import com.fluxzen.ui_design.security.SecurityUtil
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -90,22 +93,7 @@ class BabyMonitorViewModel @Inject constructor(
             nearbyTransport.events.collectLatest { event ->
                 when (event) {
                     is NearbyTransportLayer.TransportEvent.DataReceived -> {
-                        val messageStr = String(event.payload.asBytes() ?: byteArrayOf())
-
-                        val verifiedPayload = securityUtil.verifySignedMessage(context, messageStr)
-                        
-                        if (verifiedPayload != null) {
-                            try {
-                                val msg = gson.fromJson(verifiedPayload, SignalingMessage::class.java)
-                                if (msg?.type != null) {
-                                    handleSignalingMessage(msg)
-                                }
-                            } catch (e: Exception) {
-                                Log.e(TAG, "Failed to parse verified payload as JSON: $e")
-                            }
-                        } else {
-                            Log.w(TAG, "Received message failed security verification or was from untrusted peer.")
-                        }
+                        processReceivedData(event)
                     }
                     is NearbyTransportLayer.TransportEvent.AdvertisingStarted -> _connectionStatus.value = "Advertising..."
                     is NearbyTransportLayer.TransportEvent.DiscoveryStarted -> _connectionStatus.value = "Discovering..."
@@ -123,6 +111,29 @@ class BabyMonitorViewModel @Inject constructor(
                     else -> {}
                 }
             }
+        }
+    }
+
+    private suspend fun processReceivedData(event: NearbyTransportLayer.TransportEvent.DataReceived) {
+        val messageStr = String(event.payload.asBytes() ?: byteArrayOf())
+
+        val verifiedPayload = withContext(Dispatchers.Default) {
+            securityUtil.verifySignedMessage(context, messageStr)
+        }
+
+        if (verifiedPayload != null) {
+            try {
+                val msg = withContext(Dispatchers.Default) { gson.fromJson(verifiedPayload, SignalingMessage::class.java) }
+                if (msg?.type != null) {
+                    handleSignalingMessage(msg)
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to parse verified payload as JSON: $e")
+            }
+        } else {
+            Log.w(TAG, "Received message failed security verification or was from untrusted peer.")
         }
     }
 
