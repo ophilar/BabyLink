@@ -24,16 +24,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         
-        if (isCI) {
-            maven {
-                name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/ophilar/FluxZenShared")
-                credentials {
-                    username = System.getenv("GPR_USER")
-                    password = System.getenv("GPR_TOKEN")
-                }
-            }
-        }
+        // Remove GithubPackages to allow fallback to other resolution methods when unauthorized in CI
         
         maven { url = uri("https://jitpack.io") }
     }
