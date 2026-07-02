@@ -41,6 +41,8 @@ class AudioProcessingPipeline @Inject constructor(
     private val knownNonCryIndices = mutableSetOf<Int>()
     private var preAllocatedShortBuffer: ShortArray? = null
     private var preAllocatedFloatBuffer: FloatArray? = null
+    private var preAllocatedByteBuffer: ByteBuffer? = null
+    private var preAllocatedShortBufferView: java.nio.ShortBuffer? = null
 
     fun start(coroutineScope: CoroutineScope, onCryDetected: () -> Unit) {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -105,7 +107,18 @@ class AudioProcessingPipeline @Inject constructor(
             currentShortBuffer = ShortArray(requiredShortLength)
             preAllocatedShortBuffer = currentShortBuffer
         }
-        ByteBuffer.wrap(buffer).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(currentShortBuffer)
+        var currentByteBuffer = preAllocatedByteBuffer
+        if (currentByteBuffer == null || currentByteBuffer.capacity() != length) {
+            currentByteBuffer = ByteBuffer.allocate(length).order(ByteOrder.LITTLE_ENDIAN)
+            preAllocatedByteBuffer = currentByteBuffer
+            preAllocatedShortBufferView = currentByteBuffer.asShortBuffer()
+        }
+        currentByteBuffer!!.clear()
+        currentByteBuffer.put(buffer)
+
+        val shortBufferView = preAllocatedShortBufferView!!
+        shortBufferView.clear()
+        shortBufferView.get(currentShortBuffer)
 
         // 2. RMS Gating
         val rms = calculateRMS(currentShortBuffer)

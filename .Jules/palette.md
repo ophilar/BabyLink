@@ -1,3 +1,5 @@
 ## 2024-05-16 - [Connection Flow Accessibility]
 **Learning:** Found multiple areas where semantic intent wasn't clear to screen readers in connection flows. `Icon` components need `contentDescription` correctly mapped from their label or state, and actionable components acting as buttons must explicitly define `Role.Button` and `onClickLabel` using `semantics` or `clickable` modifiers.
 **Action:** Always verify `Icon`s have descriptive labels matching the state, and use semantics/roles when making general Composables (like `Column`) interactive.
+## 2024-05-24 - [Avoid HeapByteBuffer Object Allocation for Kotlin Arrays in high frequency loops]
+Using `ByteBuffer.wrap()` inside an audio processing callback (or any high frequency loop) incurs significant GC overhead due to internal object allocations (`HeapByteBuffer` and `ByteBufferAsShortBufferL` instances). We have to avoid these using pre-allocated buffers. `ByteBuffer.allocate(length)` to preallocate a HeapByteBuffer with `put()` and a cached ShortBuffer with `get()` eliminates these allocations while maintaining virtually identical performance.
