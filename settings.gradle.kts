@@ -1,6 +1,7 @@
 pluginManagement {
     repositories {
         mavenCentral()
+        mavenLocal()
         gradlePluginPortal()
         google {
             content {
@@ -23,6 +24,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        mavenLocal()
         
         if (isCI) {
             maven {

@@ -105,9 +105,10 @@ tasks.register("androidTestClasses") {
 }
 
 dependencies {
-    implementation("com.fluxzen:ui-design:1.0.2")
 
     
+    implementation("com.fluxzen:ui-design:1.0.2")
+
     // Core & Compose Bundle
     implementation(libs.androidx.core.ktx)
     implementation(platform(libs.androidx.compose.bom))

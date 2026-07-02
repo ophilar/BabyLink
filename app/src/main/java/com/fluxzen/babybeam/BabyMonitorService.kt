@@ -30,7 +30,8 @@ class BabyMonitorService : Service() {
     @Inject
     lateinit var securityUtil: SecurityUtil
 
-    private val gson = Gson()
+    @Inject
+    lateinit var gson: Gson
 
     private val notificationId = 1
     private val channelId = "baby_monitor_channel"

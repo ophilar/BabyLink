@@ -34,11 +34,11 @@ class BabyMonitorViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val nearbyTransport: NearbyTransportLayer,
     val webRtcManager: WebRtcManager,
-    private val securityUtil: SecurityUtil
+    private val securityUtil: SecurityUtil,
+    private val gson: Gson
 ) : ViewModel(), SignalingClient {
 
     private val TAG = "BabyMonitorViewModel"
-    private val gson = Gson()
 
     private var _isSender = false
 
