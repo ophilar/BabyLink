@@ -29,8 +29,10 @@ dependencyResolutionManagement {
                 name = "GitHubPackages"
                 url = uri("https://maven.pkg.github.com/ophilar/FluxZenShared")
                 credentials {
-                    username = System.getenv("GPR_USER") ?: ""
-                    password = System.getenv("GPR_TOKEN") ?: ""
+                    val fallbackUser: String? = settings.extra.properties["gpr.user"] as String?
+                    val fallbackToken: String? = settings.extra.properties["gpr.token"] as String?
+                    username = System.getenv("GPR_USER") ?: fallbackUser ?: ""
+                    password = System.getenv("GPR_TOKEN") ?: fallbackToken ?: ""
                 }
             }
         }
