@@ -29,8 +29,8 @@ dependencyResolutionManagement {
                 name = "GitHubPackages"
                 url = uri("https://maven.pkg.github.com/ophilar/FluxZenShared")
                 credentials {
-                    username = System.getenv("GPR_USER")
-                    password = System.getenv("GPR_TOKEN")
+                    username = System.getenv("GPR_USER") ?: ""
+                    password = System.getenv("GPR_TOKEN") ?: ""
                 }
             }
         }
