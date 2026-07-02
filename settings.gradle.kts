@@ -24,13 +24,15 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         
-        if (isCI) {
+        if (System.getenv("GITHUB_ACTIONS") == "true") {
             maven {
                 name = "GitHubPackages"
                 url = uri("https://maven.pkg.github.com/ophilar/FluxZenShared")
-                credentials {
-                    username = System.getenv("GPR_USER")
-                    password = System.getenv("GPR_TOKEN")
+                if (System.getenv("GPR_USER") != null && System.getenv("GPR_TOKEN") != null) {
+                    credentials {
+                        username = System.getenv("GPR_USER")
+                        password = System.getenv("GPR_TOKEN")
+                    }
                 }
             }
         }
