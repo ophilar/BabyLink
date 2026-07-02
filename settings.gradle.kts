@@ -23,10 +23,8 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        
-        // Remove GithubPackages to allow fallback to other resolution methods when unauthorized in CI
-        
         maven { url = uri("https://jitpack.io") }
+        mavenLocal()
     }
 }
 
