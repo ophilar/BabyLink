@@ -29,5 +29,6 @@ jobs:
       env:
         GITHUB_ACTIONS: "true"
         GPR_USER: ${{ github.actor }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GPR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GOOGLE_SERVICES_API_KEY: ${{ secrets.GOOGLE_SERVICES_API_KEY }}
