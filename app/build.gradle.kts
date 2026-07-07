@@ -107,7 +107,7 @@ tasks.register("androidTestClasses") {
 dependencies {
     implementation("com.fluxzen:ui-design:1.0.2")
 
-    
+
     // Core & Compose Bundle
     implementation(libs.androidx.core.ktx)
     implementation(platform(libs.androidx.compose.bom))
@@ -143,4 +143,49 @@ dependencies {
     testRuntimeOnly(libs.junit.platform.launcher)
     androidTestImplementation(libs.bundles.test.android)
     coreLibraryDesugaring(libs.android.desugar.jdk)
+}
+
+
+val generateGoogleServicesJson by tasks.registering {
+    val googleServicesFile = file("google-services.json")
+    val apiKey = System.getenv("GOOGLE_SERVICES_API_KEY") ?: "mock-api-key"
+
+    outputs.file(googleServicesFile)
+
+    doLast {
+        val jsonContent = """{
+  "project_info": {
+    "project_number": "123456789",
+    "project_id": "mock-project-id",
+    "storage_bucket": "mock-project-id.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:123456789:android:mockappid",
+        "android_client_info": {
+          "package_name": "com.fluxzen.babybeam"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "${apiKey}"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}"""
+        googleServicesFile.writeText(jsonContent)
+    }
+}
+
+tasks.matching { it.name.matches(Regex("process.*GoogleServices")) }.configureEach {
+    dependsOn(generateGoogleServicesJson)
 }
