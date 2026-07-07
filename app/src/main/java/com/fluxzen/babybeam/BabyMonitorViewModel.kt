@@ -34,11 +34,11 @@ class BabyMonitorViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val nearbyTransport: NearbyTransportLayer,
     val webRtcManager: WebRtcManager,
-    private val securityUtil: SecurityUtil
+    private val securityUtil: SecurityUtil,
+    private val gson: Gson
 ) : ViewModel(), SignalingClient {
 
     private val TAG = "BabyMonitorViewModel"
-    private val gson = Gson()
 
     private var _isSender = false
 
@@ -125,7 +125,7 @@ class BabyMonitorViewModel @Inject constructor(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to parse verified payload as JSON: $e")
+                Log.e(TAG, "Failed to parse verified payload as JSON")
             }
         } else {
             Log.w(TAG, "Received message failed security verification or was from untrusted peer.")
