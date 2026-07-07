@@ -24,6 +24,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url = uri("https://jitpack.io") }
+        mavenLocal()
         if (System.getenv("GITHUB_ACTIONS") == "true") {
             maven {
                 name = "GitHubPackages"
