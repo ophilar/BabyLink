@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      GPR_USER: ${{ github.actor }}
+      GPR_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
     steps:
     - uses: actions/checkout@v4
 
@@ -25,7 +27,7 @@ jobs:
       run: chmod +x gradlew
 
     - name: Build with Gradle
-      run: ./gradlew assembleDebug
+      run: ./gradlew assembleDebug -Pgpr.user="${{ github.actor }}" -Pgpr.token="${{ secrets.PACKAGES_TOKEN }}"
       env:
         GITHUB_ACTIONS: "true"
         GPR_USER: ophilar
