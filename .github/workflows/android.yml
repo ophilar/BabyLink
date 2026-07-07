@@ -28,5 +28,6 @@ jobs:
       run: ./gradlew assembleDebug
       env:
         GITHUB_ACTIONS: "true"
-        GPR_USER: ${{ github.actor }}
+        GPR_USER: ophilar
         GPR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GOOGLE_SERVICES_API_KEY: ${{ secrets.GOOGLE_SERVICES_API_KEY }}
