@@ -23,19 +23,21 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        
-        if (isCI) {
+        maven { url = uri("https://jitpack.io") }
+        if (System.getenv("GITHUB_ACTIONS") == "true") {
             maven {
                 name = "GitHubPackages"
                 url = uri("https://maven.pkg.github.com/ophilar/FluxZenShared")
-                credentials {
-                    username = System.getenv("GPR_USER")
-                    password = System.getenv("GPR_TOKEN")
+                val user = System.getenv("GPR_USER")
+                val token = System.getenv("GPR_TOKEN")
+                if (user != null && token != null && user.isNotBlank() && token.isNotBlank()) {
+                    credentials {
+                        username = user
+                        password = token
+                    }
                 }
             }
         }
-        
-        maven { url = uri("https://jitpack.io") }
     }
 }
 
