@@ -29,8 +29,8 @@ dependencyResolutionManagement {
             maven {
                 name = "GitHubPackages"
                 url = uri("https://maven.pkg.github.com/ophilar/FluxZenShared")
-                val fallbackUser: String? = settings.extra.properties["gpr.user"] as String?
-                val fallbackToken: String? = settings.extra.properties["gpr.token"] as String?
+                val fallbackUser: String? = settings.extra.properties["gpr.user"]?.toString()
+                val fallbackToken: String? = settings.extra.properties["gpr.token"]?.toString()
                 val user = System.getenv("GPR_USER") ?: fallbackUser
                 val token = System.getenv("GPR_TOKEN") ?: fallbackToken
                 if (user != null && token != null && user.isNotBlank() && token.isNotBlank()) {
