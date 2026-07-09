@@ -37,8 +37,7 @@ class AudioProcessingPipeline @Inject constructor(
     @Volatile private var isCurrentlyNoisy = false
     private var lastCryTime = 0L
     private val cryDebounceTimeMs = 5000L
-    private val knownCryIndices = mutableSetOf<Int>()
-    private val knownNonCryIndices = mutableSetOf<Int>()
+    private var categoryCache = ByteArray(1024)
     private var preAllocatedShortBuffer: ShortArray? = null
     private var preAllocatedFloatBuffer: FloatArray? = null
     private var preAllocatedByteBuffer: ByteBuffer? = null
@@ -161,18 +160,16 @@ class AudioProcessingPipeline @Inject constructor(
         // Look for "cry" or "baby crying" using dynamically built cache
         val cryCategory = categories.find { category: Category -> 
             val idx = category.index()
-            if (knownCryIndices.contains(idx)) {
-                true
-            } else if (knownNonCryIndices.contains(idx)) {
-                false
+            val status = if (idx < categoryCache.size) categoryCache[idx].toInt() else 0
+            if (status != 0) {
+                status == 2
             } else {
                 val isCry = category.categoryName().contains("cry", ignoreCase = true) ||
                             category.displayName().contains("cry", ignoreCase = true)
-                if (isCry) {
-                    knownCryIndices.add(idx)
-                } else {
-                    knownNonCryIndices.add(idx)
+                if (idx >= categoryCache.size) {
+                    categoryCache = categoryCache.copyOf(maxOf(categoryCache.size * 2, idx + 1))
                 }
+                categoryCache[idx] = if (isCry) 2.toByte() else 1.toByte()
                 isCry
             }
         }

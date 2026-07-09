@@ -26,14 +26,17 @@ dependencyResolutionManagement {
         maven { url = uri("https://jitpack.io") }
         mavenLocal()
         if (System.getenv("GITHUB_ACTIONS") == "true") {
-            maven {
-                name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/ophilar/FluxZenShared")
-                val fallbackUser: String? = providers.gradleProperty("gpr.user").orNull
-                val fallbackToken: String? = providers.gradleProperty("gpr.token").orNull
-                val user = System.getenv("GPR_USER") ?: fallbackUser
-                val token = System.getenv("GPR_TOKEN") ?: fallbackToken
-                if (user != null && token != null && user.isNotBlank() && token.isNotBlank()) {
+            val fallbackUser: String? = providers.gradleProperty("gpr.user").orNull
+            val fallbackToken: String? = providers.gradleProperty("gpr.token").orNull
+            val user = fallbackUser?.takeIf { it.isNotBlank() } ?: System.getenv("GPR_USER")?.takeIf { it.isNotBlank() }
+            val token = fallbackToken?.takeIf { it.isNotBlank() } ?: System.getenv("GPR_TOKEN")?.takeIf { it.isNotBlank() }
+
+            // Only add the GitHub Packages repository if we actually have a valid token to authenticate with.
+            // Otherwise, let Gradle fall back to other repositories (like Jitpack) to avoid 401 Unauthorized errors.
+            if (user != null && token != null && user.isNotBlank() && token.isNotBlank()) {
+                maven {
+                    name = "GitHubPackages"
+                    url = uri("https://maven.pkg.github.com/ophilar/FluxZenShared")
                     credentials {
                         username = user
                         password = token

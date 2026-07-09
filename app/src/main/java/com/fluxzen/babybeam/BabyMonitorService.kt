@@ -8,7 +8,6 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.fluxzen.ui_design.sync.NearbyTransportLayer
-import com.fluxzen.ui_design.sync.SignalingMessage
 import com.fluxzen.ui_design.security.SecurityUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -16,7 +15,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import javax.inject.Inject
-import com.google.gson.Gson
 
 @AndroidEntryPoint
 class BabyMonitorService : Service() {
@@ -30,8 +28,6 @@ class BabyMonitorService : Service() {
     @Inject
     lateinit var securityUtil: SecurityUtil
 
-    @Inject
-    lateinit var gson: Gson
 
     private val notificationId = 1
     private val channelId = "baby_monitor_channel"
@@ -77,8 +73,7 @@ class BabyMonitorService : Service() {
 
         audioPipeline.start(serviceScope) {
             Log.i("BabyMonitorService", "Cry Detected! Initiating alert...")
-            val msg = SignalingMessage(type = "cry_detected")
-            val json = gson.toJson(msg)
+            val json = "{\"type\":\"cry_detected\"}"
             val signedPayload = securityUtil.generateSignedMessage(applicationContext, json)
             nearbyTransport.broadcastMessage(signedPayload)
         }
