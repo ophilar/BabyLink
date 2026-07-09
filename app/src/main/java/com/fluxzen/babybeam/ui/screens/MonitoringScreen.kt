@@ -34,9 +34,9 @@ fun MonitoringScreen(
     val animations = rememberThemeAnimations()
     
     // State placeholders (would be driven by service/viewModel)
-    val temperature = 21
-    val humidity = 45
-    val noiseLevel = 0.2f // Normalized 0.0 to 1.0
+    val temperature: Int? = null
+    val humidity: Int? = null
+    val noiseLevel = 0.0f // Normalized 0.0 to 1.0
 
     val isNightLightOn by viewModel.isNightLightOn.collectAsState()
 
@@ -87,7 +87,7 @@ fun MonitoringScreen(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = "$temperature°C",
+                    text = temperature?.let { "$it°C" } ?: "--",
                     fontSize = 80.sp,
                     fontWeight = FontWeight.Light,
                     color = strategy.contentColor
@@ -119,7 +119,7 @@ fun MonitoringScreen(
                 ) {
                     // Humidity
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = "$humidity%", fontWeight = FontWeight.Bold, color = strategy.contentColor)
+                        Text(text = humidity?.let { "$it%" } ?: "--", fontWeight = FontWeight.Bold, color = strategy.contentColor)
                         Text(text = "Humidity", style = strategy.typography.bodySmall, color = strategy.contentColor.copy(alpha = 0.5f))
                     }
 
