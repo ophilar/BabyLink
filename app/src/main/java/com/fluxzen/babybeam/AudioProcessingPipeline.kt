@@ -133,7 +133,7 @@ class AudioProcessingPipeline @Inject constructor(
             }
 
             for (i in currentShortBuffer.indices) {
-                currentFloatBuffer[i] = currentShortBuffer[i] / 32768.0f // Normalize to [-1.0, 1.0]
+                currentFloatBuffer[i] = currentShortBuffer[i] * 0.000030517578125f // Normalize to [-1.0, 1.0]
             }
 
             val audioData = AudioData.create(
