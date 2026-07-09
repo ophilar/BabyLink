@@ -212,7 +212,7 @@ class BabyMonitorViewModel @Inject constructor(
         } else {
             activityContext.startService(intent)
         }
-        nearbyTransport.startAdvertising("BabyDevice_${System.currentTimeMillis()}")
+        nearbyTransport.startAdvertising("BabyDevice_${java.util.UUID.randomUUID().toString()}")
     }
 
     fun startDiscovery() {
