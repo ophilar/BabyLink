@@ -39,7 +39,6 @@ dependencyResolutionManagement {
                         password = token
                     }
                 }
-                }
             }
         }
     }
