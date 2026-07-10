@@ -11,7 +11,7 @@ plugins {
 
 android {
     namespace = "com.fluxzen.babybeam"
-    compileSdk = 36
+    compileSdk = 37
     
     kotlin {
         jvmToolchain(21)
@@ -20,7 +20,7 @@ android {
     defaultConfig {
         applicationId = "com.fluxzen.babybeam"
         minSdk = 31
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
@@ -124,7 +124,9 @@ dependencies {
     
     // AI & Streaming
     implementation(libs.mediapipe.tasks.audio)
-    implementation(libs.litert) // Enforce 16KB alignment
+    implementation(libs.litert) {
+        exclude(group = "com.google.ai.edge.litert", module = "litert-api")
+    }
     implementation(libs.webrtc.android)
     
     // WorkManager (Fixes PendingIntent S+ crash)
@@ -141,12 +143,14 @@ dependencies {
     testImplementation(libs.bundles.test.unit)
     testRuntimeOnly(libs.junit.jupiter.engine)
     testRuntimeOnly(libs.junit.platform.launcher)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.bundles.test.android)
+    debugImplementation(libs.androidx.ui.test.manifest)
     coreLibraryDesugaring(libs.android.desugar.jdk)
 }
 
 
-val generateGoogleServicesJson by tasks.registering {
+val generateGoogleServicesJson = tasks.register("generateGoogleServicesJson") {
     val googleServicesFile = file("google-services.json")
     val apiKey = System.getenv("GOOGLE_SERVICES_API_KEY") ?: "mock-api-key"
 
